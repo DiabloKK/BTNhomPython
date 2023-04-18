@@ -10,6 +10,12 @@ class Phong(models.Model):
     TenToaNha = models.CharField(max_length=50)
     class Meta:
         db_table = 'Phong'
+    @classmethod
+    def create_Phong(cls, MaPhong, TrangThai, SoluongSV, LoaiPhong, Gia,TenToaNha):
+        new_Phong = cls(MaPhong = MaPhong, TrangThai = TrangThai, SoluongSV = SoluongSV,
+                         LoaiPhong = LoaiPhong, Gia = Gia,TenToaNha = TenToaNha)
+        new_Phong.save()
+
 
 class SinhVien(models.Model):
     MSSV = models.CharField(max_length=50)
