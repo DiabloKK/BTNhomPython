@@ -1,5 +1,4 @@
 from django.shortcuts import render,get_object_or_404, redirect
-from .cnDB import get_all_phong
 from .models import Phong
 # Create your views here.
 def index(request):
@@ -14,7 +13,6 @@ def phong(request):
 
 def update_phong(request,id):
     data = get_object_or_404(Phong, id=id)
-    phongs = Phong.objects.all()
     if request.method == 'POST':
         data.MaPhong = request.POST['MaPhong']
         data.TrangThai =  request.POST['TrangThai']
@@ -23,5 +21,20 @@ def update_phong(request,id):
         data.Gia = request.POST['Gia']
         data.TenToaNha = request.POST['TenToaNha']
         data.save()
-        return render(request, './pages/phong.html',{'data': phongs})
+        return redirect(phong)
     return render(request, './pages/update.html',{'data': data})
+
+
+def add_Phong(request):
+    # phongs = Phong.objects.all()
+    if request.method == 'POST':
+        Phong.create_Phong(
+            request.POST['MaPhong'],
+            request.POST['TrangThai'],
+            request.POST['SoluongSV'],
+            request.POST['LoaiPhong'],
+            request.POST['Gia'],
+            request.POST['TenToaNha']
+            )
+        return redirect(phong)
+    return render(request, './pages/add.html')

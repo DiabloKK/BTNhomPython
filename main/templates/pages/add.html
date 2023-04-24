@@ -1,0 +1,40 @@
+{% extends "./base.html" %}
+{% load static %}
+
+
+{% block title %}Room{% endblock %}
+   
+{% block content %}
+
+    <form action="add_Phong" method="post">
+        {% csrf_token %}
+        <div class="mb-3">
+            <label  class="form-label">Ma phong</label>
+            <input type="text" class="form-control"
+                    name="MaPhong" value="">
+        </div>
+        <div class="mb-3">
+            <label  class="form-label">Trang thai</label>
+            <input type="text" class="form-control"
+                   aria-describedby="emailHelp" name="TrangThai" value="">
+        </div>
+        <div class="mb-3">
+            <label  class="form-label">So Luong SV</label>
+            <input type="text" class="form-control" name="SoluongSV" value="">
+        </div>
+        <div class="mb-3">
+            <label  class="form-label">Loai Phong</label>
+            <input type="text" class="form-control" name="LoaiPhong" value="">
+        </div>
+        <div class="mb-3">
+            <label  class="form-label">Gia</label>
+            <input type="text" class="form-control" name="Gia" value="">
+        </div>
+        <div class="mb-3">
+            <label  class="form-label">Ten Toa Nha</label>
+            <input type="text" class="form-control" name="TenToaNha" value="">
+        </div>
+
+        <button type="submit" class="btn btn-primary"  name="updatedata">Add</button>
+    </form>
+{% endblock %}
