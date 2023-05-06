@@ -43,3 +43,21 @@ def update_sinhvien(request, id):
 
     # Render the update SinhVien form with the current data for the SinhVien object
     return render(request, 'sinhvien_detail.html', {'sinhvien': sinhvien})
+
+
+def add_sinhvien(request):
+
+    # if request.method == 'POST':
+    #     sinhvien = SinhVien(HoTen=request.POST['hoten'],
+    #                         GioiTinh=request.POST['gioitinh'],
+    #                         NgaySinh=request.POST['ngaysinh'],
+    #                         DiaChi=request.POST['diachi'],
+    #                         Email=request.POST['email'],
+    #                         SoDienThoai=request.POST['sodienthoai'],
+    #                         MaPhong_id=request.POST['maphong'],)
+
+    #     sinhvien.save()
+
+    #     return redirect(sinhviens)
+
+    return render(request, 'add_sinhvien.html')
