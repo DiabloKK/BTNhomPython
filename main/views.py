@@ -3,7 +3,7 @@
 from .models import Phong,SinhVien
 
 import datetime
-from django.shortcuts import redirect, render,get_object_or_404
+from django.shortcuts import get_object_or_404, redirect, render
 from django.db.models import Q
 from main.models import QuanLi
 from django.core.paginator import Paginator
@@ -23,7 +23,36 @@ def phong(request):
         sinh_vien = SinhVien.objects.filter(MaPhong_id=phong.id)
         so_luong = sinh_vien.count()
         phong.count = so_luong
-    return render(request, './pages/phong.html',{'data': data})
+    
+    # Tạo một đối tượng Paginator với all_records và số lượng bản ghi mỗi trang
+    paginator = Paginator(data, 3)
+    
+    # Lấy số trang từ query parameter (nếu không có sẽ trả về trang đầu tiên)
+    page_number = int(request.GET.get('page', 1))
+    
+    # Lấy dữ liệu trang cụ thể từ Paginator
+    data_page = paginator.get_page(page_number)
+    
+    # Tìm số page chia được
+    totaldata = len(data)
+    if totaldata%3==0: 
+        total_page = int(totaldata/3)
+    else:
+        total_page = int(totaldata/3) + 1
+    
+    index = (page_number - 1)*3
+    numbers = list(range(1, total_page+1))
+
+    context = {
+        'data': data_page,
+        'page': page_number,
+        'index': index,
+        'totalPage': total_page,
+        'numbers': numbers,
+        'totaldata': totaldata,
+    }
+
+    return render(request, './pages/phong.html',context)
 
 def update_phong(request,id):
     data = get_object_or_404(Phong, id=id)
@@ -54,14 +83,53 @@ def add_Phong(request):
     return render(request, './pages/add.html')
 
 def nhanViens(request):
-    if request.method == 'GET':
-        nhanviens = QuanLi.objects.all()
-    elif request.method == 'POST':
-        txt = str(request.POST.get('txt')).strip()
-        print(txt)
-        nhanviens = QuanLi.objects.filter(Q(MaQuanLi__icontains=txt) | Q(HoTen__icontains=txt) | Q(SoDienThoai__icontains=txt) | Q(Email__icontains=txt))
+    sort = request.GET.get('sort')
+    keyword = request.GET.get('keyword', '')
+    if sort == None:
+        type = '-'
+        sort = 'MaQuanLi'
+    elif '-' in sort:
+        type = ''
+    else:
+        type = '-'
 
-    context = {'nhanviens': nhanviens}
+    if request.method == 'POST':
+        txt = str(request.POST.get('txt')).strip()
+        keyword = txt
+    
+    nhanviens = QuanLi.objects.filter(Q(MaQuanLi__icontains=keyword) | Q(HoTen__icontains=keyword) | Q(SoDienThoai__icontains=keyword) | Q(Email__icontains=keyword) | Q(Role__icontains=keyword)).order_by(sort)
+
+    # Tạo một đối tượng Paginator với all_records và số lượng bản ghi mỗi trang
+    paginator = Paginator(nhanviens, 5)
+    
+    # Lấy số trang từ query parameter (nếu không có sẽ trả về trang đầu tiên)
+    page_number = int(request.GET.get('page', 1))
+    
+    # Lấy dữ liệu trang cụ thể từ Paginator
+    nhanviens_page = paginator.get_page(page_number)
+    
+    # Tìm số page chia được
+    totalNhanVien = len(nhanviens)
+    if totalNhanVien%5==0: 
+        total_page = int(totalNhanVien/5)
+    else:
+        total_page = int(totalNhanVien/5) + 1
+    
+    index = (page_number - 1)*5
+    numbers = list(range(1, total_page+1))
+
+    
+    context = {
+        'nhanviens': nhanviens_page,
+        'page': page_number,
+        'index': index,
+        'totalPage': total_page,
+        'numbers': numbers,
+        'totalNhanVien': totalNhanVien,
+        'sort': type,
+        'keyword': keyword
+    }
+
     return render(request, 'nhanviens.html', context)
 
 def nhanVien(request, id):
@@ -137,7 +205,7 @@ def nhanVien_save(request):
             maQuanLi = "KTX" + str(stt)
         
         # Lưu nhân viên mới    
-        nhanvien = QuanLi(MaQuanLi = maQuanLi, HoTen=name, NgaySinh=birthday, SoDienThoai=phone, Email=email, Password="123456", Role="NORMAL")
+        nhanvien = QuanLi(MaQuanLi = maQuanLi, HoTen=name, NgaySinh=birthday, SoDienThoai=phone, Email=email, Password="123456", Role=role)
         nhanvien.save()
         request.session['message'] = 'Đã thêm thành công!'
         return redirect('/nhanvien/' + str(id) + "/")  
@@ -163,6 +231,7 @@ def nhanVien_save(request):
         nhanvien.NgaySinh = birthday
         nhanvien.SoDienThoai = phone
         nhanvien.Email = email
+        nhanvien.Role = role
         nhanvien.save()
         return redirect('/nhanviens/')
     
