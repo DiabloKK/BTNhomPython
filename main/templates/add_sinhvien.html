@@ -30,8 +30,9 @@
         </div>
         <div class="form-floating mb-3">
             <select class="form-select" name="maphong">
-                <option value="1">Phòng 001</option>
-                <option value="2">Phòng 002</option>
+                {% for phong in phongs %}
+                <option value="{{phong.id}}">Phòng {{phong.MaPhong}}</option>
+                {% endfor%}
             </select>
             <label for="floatingSelect">Phòng</label>
         </div>
