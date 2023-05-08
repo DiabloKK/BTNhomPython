@@ -21,7 +21,8 @@ def profile(request):
 
 def sinhviens(request):
     query = request.GET.get('q', '')
-    sinhviens = SinhVien.objects.filter(HoTen__icontains=query)
+    phong = request.GET.get('rid', '')
+    sinhviens = SinhVien.objects.filter(HoTen__icontains=query, MaPhong=phong)
     # context = {"sinhviens": sinhviens}
 
     # Tạo một đối tượng Paginator với all_records và số lượng bản ghi mỗi trang
@@ -101,8 +102,8 @@ def add_sinhvien(request):
         sinhvien.save()
 
         return redirect(sinhviens)
-
-    return render(request, 'add_sinhvien.html')
+    phongs = Phong.objects.all()
+    return render(request, 'add_sinhvien.html', {'phongs': phongs})
 
 
 def nhanViens(request):
@@ -267,29 +268,30 @@ def nhanVien_delete(request, id):
     nhanvien.delete()
     return nhanViens(request)
 
+
 def phong(request):
     data = Phong.objects.all()
     for phong in data:
         sinh_vien = SinhVien.objects.filter(MaPhong_id=phong.id)
         so_luong = sinh_vien.count()
         phong.count = so_luong
-    
+
     # Tạo một đối tượng Paginator với all_records và số lượng bản ghi mỗi trang
     paginator = Paginator(data, 3)
-    
+
     # Lấy số trang từ query parameter (nếu không có sẽ trả về trang đầu tiên)
     page_number = int(request.GET.get('page', 1))
-    
+
     # Lấy dữ liệu trang cụ thể từ Paginator
     data_page = paginator.get_page(page_number)
-    
+
     # Tìm số page chia được
     totaldata = len(data)
-    if totaldata%3==0: 
+    if totaldata % 3 == 0:
         total_page = int(totaldata/3)
     else:
         total_page = int(totaldata/3) + 1
-    
+
     index = (page_number - 1)*3
     numbers = list(range(1, total_page+1))
 
@@ -302,20 +304,21 @@ def phong(request):
         'totaldata': totaldata,
     }
 
-    return render(request, './pages/phong.html',context)
+    return render(request, './pages/phong.html', context)
 
-def update_phong(request,id):
+
+def update_phong(request, id):
     data = get_object_or_404(Phong, id=id)
     if request.method == 'POST':
         data.MaPhong = request.POST['MaPhong']
-        data.TrangThai =  request.POST['TrangThai']
+        data.TrangThai = request.POST['TrangThai']
         data.SoluongSV = request.POST['SoluongSV']
         data.LoaiPhong = request.POST['LoaiPhong']
         data.Gia = request.POST['Gia']
         data.TenToaNha = request.POST['TenToaNha']
         data.save()
         return redirect(phong)
-    return render(request, './pages/update.html',{'data': data})
+    return render(request, './pages/update.html', {'data': data})
 
 
 def add_Phong(request):
@@ -328,6 +331,6 @@ def add_Phong(request):
             request.POST['LoaiPhong'],
             request.POST['Gia'],
             request.POST['TenToaNha']
-            )
+        )
         return redirect(phong)
     return render(request, './pages/add.html')

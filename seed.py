@@ -1,5 +1,4 @@
 from main.models import Phong, SinhVien
-import django
 from datetime import date
 # Create 5 Phong objects
 p1 = Phong(MaPhong='P001', TrangThai='available', SoluongSV=4,
@@ -12,7 +11,11 @@ p4 = Phong(MaPhong='P004', TrangThai='unavailable', SoluongSV=2,
            LoaiPhong='single', Gia=150, TenToaNha='Toa nha C')
 p5 = Phong(MaPhong='P005', TrangThai='available', SoluongSV=4,
            LoaiPhong='double', Gia=200, TenToaNha='Toa nha D')
-
+p1.save()
+p2.save()
+p3.save()
+p4.save()
+p5.save()
 p1 = Phong.objects.filter(id=1)[0]
 p2 = Phong.objects.filter(id=2)[0]
 
