@@ -1,1 +1,4 @@
+/main/__pycache__
+/main/migrations
+/myenv
 db.sqlite3
