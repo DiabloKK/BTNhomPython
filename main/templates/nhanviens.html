@@ -1,18 +1,32 @@
 {% include 'header.html' %}
 
-<div class="container-fluid pt-4 px-4" style="padding-left: 0 !important;">
+<div class="container-fluid pt-4 px-4">
+    <div class="row g-4">
+        <div class="col-sm-6 col-xl-3">
+            <div class="bg-light rounded d-flex align-items-center justify-content-between p-4">
+                <i class="fa fa-chart-bar fa-3x text-primary"></i>
+                <div class="ms-3">
+                    <p class="mb-2">Số nhân viên</p>
+                    <h6 class="mb-0">{{totalNhanVien}}</h6>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid pt-4 px-4" style="padding-left: 0 !important">
     <div class="bg-light text-center rounded p-4">
         <div class="d-flex align-items-center justify-content-between mb-4">
             <div class="d-flex align-items-center justify-content-between mb-4">
                 <h6 class="mb-0">Nhân viên</h6>
                 <form class="d-none d-md-flex ms-4" action="" method="POST">
-                <input type="search" name="txt" class="form-control">
+                    <input type="search" name="txt" class="form-control" value="{{keyword}}" />
                     &nbsp;&nbsp;
                     <button type="submit" class="btn btn-primary">
                         <i class="fas fa-search"></i>
                     </button>
                     &nbsp;&nbsp;
-                    <button type="reset" class="btn btn-secondary">
+                    <button type="button" class="btn btn-secondary" onclick="clearFilter()">
                         <i class="fas fa-eraser"></i>
                     </button>
                     {% csrf_token %}
@@ -25,11 +39,35 @@
                 <thead>
                     <tr class="text-dark">
                         <th scope="col">STT</th>
-                        <th scope="col">Mã Nhân viên</th>
-                        <th scope="col">Họ và tên</th>
-                        <th scope="col">Ngày sinh</th>
+                        <th scope="col">
+                            <a
+                                style="color: black"
+                                href="/nhanviens/?page={{page}}&sort={{sort}}MaQuanLi{% if keyword != '' %}&keyword={{keyword}} {% endif %}"
+                                >Mã nhân viên</a
+                            >
+                        </th>
+                        <th scope="col">
+                            <a
+                                style="color: black"
+                                href="/nhanviens/?page={{page}}&sort={{sort}}HoTen{% if keyword != '' %}&keyword={{keyword}} {% endif %}"
+                                >Họ và tên</a
+                            >
+                        </th>
+                        <th scope="col">
+                            <a
+                                style="color: black"
+                                href="/nhanviens/?page={{page}}&sort={{sort}}NgaySinh{% if keyword != '' %}&keyword={{keyword}} {% endif %}"
+                                >Ngày sinh</a
+                            >
+                        </th>
                         <th scope="col">Số điện thoại</th>
-                        <th scope="col">Email</th>
+                        <th scope="col">
+                            <a
+                                style="color: black"
+                                href="/nhanviens/?page={{page}}&sort={{sort}}Email{% if keyword != '' %}&keyword={{keyword}} {% endif %}"
+                                >Email</a
+                            >
+                        </th>
                         <th scope="col">Role</th>
                         <th scope="col"></th>
                         <th scope="col"></th>
@@ -38,47 +76,63 @@
                 <tbody>
                     {% for nhanvien in nhanviens %}
                     <tr>
-                        <td>{{forloop.counter}}</td>
+                        <td>{{forloop.counter|add:index}}</td>
                         <td>{{nhanvien.MaQuanLi}}</td>
                         <td>{{nhanvien.HoTen}}</td>
                         <td>{{nhanvien.NgaySinh}}</td>
                         <td>{{nhanvien.SoDienThoai}}</td>
                         <td>{{nhanvien.Email}}</td>
                         <td>{{nhanvien.Role}}</td>
-                        <td><a class="btn btn-sm btn-primary" href="/nhanvien/{{nhanvien.id}}">Update</a></td>
-                        <td><a class="btn btn-sm btn-danger" href="/nhanvien/delete/{{nhanvien.id}}">Delete</a></td>
+                        <td>
+                            <a class="btn btn-sm btn-primary" href="/nhanvien/{{nhanvien.id}}"
+                                >Update</a
+                            >
+                        </td>
+                        <td>
+                            <a class="btn btn-sm btn-danger" href="/nhanvien/delete/{{nhanvien.id}}"
+                                >Delete</a
+                            >
+                        </td>
                     </tr>
                     {% endfor %}
                 </tbody>
             </table>
         </div>
-    </div>
-    <div th:if="${totalPages > 1}">
-        <nav>
-            <ul class="pagination justify-content-center flex-wrap">
-                <li th:class="${currentPage > 1 ? 'page-item' : 'page-item disabled'}">
-                    <a th:replace="~{fragments :: page_link(${moduleURL}, 1, 'First')}"></a>
-                </li>
-                <li th:class="${currentPage > 1 ? 'page-item' : 'page-item disabled'}">
-                    <a th:replace="~{fragments :: page_link(${moduleURL}, ${currentPage - 1}, 'Previous')}"></a>
-                </li>
+        {% if totalPage > 1 %}
+        <div class="mt-3">
+            <nav>
+                <ul class="pagination justify-content-center flex-wrap">
+                    <li class="page-item {% if page > 1 %} {% else %} disabled {% endif %}">
+                        <a class="page-link" href="/nhanviens/">First</a>
+                    </li>
+                    <li class="page-item {% if page > 1 %} {% else %} disabled {% endif %}">
+                        <a class="page-link" href="/nhanviens/?page={{page|add:-1}}">Previous</a>
+                    </li>
 
-                <li th:class="${currentPage != i ? 'page-item': 'page-item active'}"
-                    th:each="i : ${#numbers.sequence(1, totalPages)}">
-                    <a th:replace="~{fragments :: page_link(${moduleURL}, ${i}, ${i})}"></a>
-                </li>
+                    {% for i in numbers %}
+                    <li class="page-item {% if page != i %} {% else %} active {% endif %}">
+                        <a class="page-link" href="/nhanviens/?page={{i}}">{{i}}</a>
+                    </li>
+                    {% endfor %}
 
-                <li th:class="${currentPage < totalPages ? 'page-item' : 'page-item disabled'}">
-                    <a th:replace="~{fragments :: page_link(${moduleURL}, ${currentPage + 1}, 'Next')}"></a>
-                </li>
-
-                <li th:class="${currentPage < totalPages ? 'page-item' : 'page-item disabled'}">
-                    <a th:replace="~{fragments :: page_link(${moduleURL}, ${totalPages}, 'Last')}"></a>
-                </li>
-            </ul>
-        </nav>
+                    <li class="page-item {% if page < totalPage %} {% else %} disabled {% endif %}">
+                        <a class="page-link" href="/nhanviens/?page={{page|add:1}}">Next</a>
+                    </li>
+                    <li class="page-item {% if page < totalPage %} {% else %} disabled {% endif %}">
+                        <a class="page-link" href="/nhanviens/?page={{totalPage}}">Last</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
     </div>
 </div>
 <!-- Recent Sales End -->
+
+<script type="text/javascript">
+    function clearFilter() {
+        window.location = "http://127.0.0.1:8000/nhanviens/";
+    }
+</script>
 
 {% include 'footer.html' %}
