@@ -35,6 +35,7 @@ class QuanLi(models.Model):
     NgaySinh = models.DateField()
     SoDienThoai = models.CharField(max_length=10)
     Email = models.CharField(max_length=100)
+    Password = models.CharField(max_length=100)
     Role = models.CharField(max_length=50)
     class Meta:
         db_table = 'QuanLi'

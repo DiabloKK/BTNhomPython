@@ -1,10 +1,10 @@
-{% extends "./base.html" %}
+{% include '../header.html' %}
 {% load static %}
 
 
-{% block title %}Room{% endblock %}
+<!-- {% block title %}Room{% endblock %} -->
    
-{% block content %}
+
 
     <form action="/phong/{{ data.id }}/" method="post">
         {% csrf_token %}
@@ -37,4 +37,4 @@
 
         <button type="submit" class="btn btn-primary"  name="updatedata">Update</button>
     </form>
-{% endblock %}
+    {% include '../footer.html' %}

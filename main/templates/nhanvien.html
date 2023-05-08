@@ -1,0 +1,50 @@
+{% load static %}
+{% include 'header.html' %}
+
+<div class="container-fluid pt-4 px-4" style="padding-left: 0 !important;">
+    <div class="bg-light rounded p-4">
+        <div class="text-center" style="margin-bottom: 20px !important;">
+            <h6 class="mb-0">{{title}}</h6>
+        </div>
+        {% if message != null %}
+            <div class="mb-3 text-center" style="color: red">
+                <p>{{message}}</P>
+            </div>    
+        {% endif %}
+        <form action="/nhanvien/save" method="post" style="padding: 0 200px !important;">
+            <div class="mb-3">
+                <labe class="form-label">Họ và tên</label>
+                <input type="text" class="form-control" id="name" name="name" value="{{nhanvien.HoTen}}">
+            </div>
+            <div class="mb-3">
+                <labe class="form-label">Ngày sinh</label>
+                <input type="date" class="form-control" id="birthday" name="birthday" value="{{nhanvien.NgaySinh|date:'Y-m-d'}}">
+            </div>
+            <div class="mb-3">
+                <labe class="form-label">Số điện thoại</label>
+                <input type="text" class="form-control" id="phone" name="phone" value="{{nhanvien.SoDienThoai}}">
+            </div>
+            <div class="mb-3">
+                <labe class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" value="{{nhanvien.Email}}">
+            </div>
+            <div class="mb-3">
+                <labe class="form-label">Role</label>
+                <select class="form-control"  id="role" name="role" value="{{nhanvien.Role}}">
+                    <option value="">-- Select role --</option>
+                    <option value="ADMIN" {% if nhanvien.Role == "ADMIN" %}selected{% endif %}>Admin</option>
+                    <option value="NORMAL" {% if nhanvien.Role == "NORMAL" %}selected{% endif %}>Normal</option>
+                </select>
+            </div>
+            <input type="hidden" class="form-control" id="email" name="id" value="{{nhanvien.id}}">
+            <div class="mb-3 text-center">
+                <button type="submit" class="btn btn-primary" style="margin-left: 30px">Submit</button>
+            </div>
+            {% csrf_token %}
+            </form>
+        </div>
+    </div>
+</div>
+
+    
+{% include 'footer.html' %}
