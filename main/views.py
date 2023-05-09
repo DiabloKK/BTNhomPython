@@ -2,23 +2,51 @@ from django.shortcuts import redirect, render, get_object_or_404
 from main.models import Phong
 from main.models import SinhVien
 import datetime
-import math
 from django.shortcuts import redirect, render
 from django.db.models import Q
 from main.models import QuanLi
 from django.core.paginator import Paginator
+from django.contrib.auth import authenticate, login, logout
+from django.http import HttpResponse
+from django.contrib.auth.models import User
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
-
+@login_required
 def index(request):
+    # QuanLi.objects.all().delete()
     return render(request, 'index.html')
 
+def login_view(request):
+    if request.method == 'GET':
+        return render(request, 'login.html')
+    elif request.method == 'POST':
+        email = str(request.POST.get('email')).strip()
+        password = str(request.POST.get('password')).strip()
+        
+        user = authenticate(request, username=email, password=password)
+        
+        if user is not None:
+            login(request, user)
+            nhanvien = QuanLi.objects.get(Email = email)
+            request.session['role'] = nhanvien.Role
+            request.session['name'] = nhanvien.HoTen
+            return redirect("/")
+        else:
+            return render(request, 'login.html', {'message': 'Tài khoản hoặc mật khẩu không chính xác'})
 
+def logout_view(request):
+    logout(request)
+    response = redirect('/login/')
+    
+    return response
+
+@login_required
 def profile(request):
     return render(request, 'profile.html')
 
-
+@login_required
 def sinhviens(request):
     query = request.GET.get('q', '')
     sinhviens = SinhVien.objects.filter(HoTen__icontains=query)
@@ -58,14 +86,14 @@ def sinhviens(request):
 
     return render(request, 'sinhvien.html', context)
 
-
+@login_required
 def sinhvien_detail(request, id):
     sinhvien = SinhVien.objects.filter(id=id)[0]
     sinhvien.NgaySinh = sinhvien.NgaySinh.strftime("%Y-%m-%d")
     context = {"sinhvien": sinhvien}
     return render(request, 'sinhvien_detail.html', context)
 
-
+@login_required
 def update_sinhvien(request, id):
     sinhvien = get_object_or_404(SinhVien, pk=id)
 
@@ -86,7 +114,7 @@ def update_sinhvien(request, id):
     # Render the update SinhVien form with the current data for the SinhVien object
     return render(request, 'sinhvien_detail.html', {'sinhvien': sinhvien})
 
-
+@login_required
 def add_sinhvien(request):
     if request.method == 'POST':
         sinhvien = SinhVien(HoTen=request.POST['hoten'],
@@ -104,8 +132,13 @@ def add_sinhvien(request):
 
     return render(request, 'add_sinhvien.html')
 
-
+@login_required
 def nhanViens(request):
+    role = request.session['role']
+    
+    if role != 'ADMIN':
+        return redirect("/")
+    
     sort = request.GET.get('sort')
     keyword = request.GET.get('keyword', '')
     if sort == None:
@@ -155,8 +188,13 @@ def nhanViens(request):
 
     return render(request, 'nhanviens.html', context)
 
-
+@login_required
 def nhanVien(request, id):
+    role = request.session['role']
+    
+    if role != 'ADMIN':
+        return redirect("/")
+    
     data = {}
     if id == 0:
         data['title'] = "Thêm nhân viên"
@@ -177,8 +215,13 @@ def nhanVien(request, id):
         del request.session['nhanvien']
     return render(request, 'nhanvien.html', data)
 
-
+@login_required
 def nhanVien_save(request):
+    role = request.session['role']
+    
+    if role != 'ADMIN':
+        return redirect("/")
+    
     # Nhận dữ liệu
     name = str(request.POST.get('name')).strip()
     birthday = str(request.POST.get('birthday')).strip()
@@ -231,8 +274,14 @@ def nhanVien_save(request):
 
         # Lưu nhân viên mới
         nhanvien = QuanLi(MaQuanLi=maQuanLi, HoTen=name, NgaySinh=birthday,
-                          SoDienThoai=phone, Email=email, Password="123456", Role=role)
+                          SoDienThoai=phone, Email=email, Role=role)
         nhanvien.save()
+        
+        # tạo user mới
+        user = User.objects.create_user(email, email, '123456')
+        # lưu user vào database
+        user.save()
+        
         request.session['message'] = 'Đã thêm thành công!'
         return redirect('/nhanvien/' + str(id) + "/")
     else:
@@ -261,12 +310,18 @@ def nhanVien_save(request):
         nhanvien.save()
         return redirect('/nhanviens/')
 
-
+@login_required
 def nhanVien_delete(request, id):
+    role = request.session['role']
+    
+    if role != 'ADMIN':
+        return redirect("/")
+    
     nhanvien = QuanLi.objects.get(id=id)
     nhanvien.delete()
     return nhanViens(request)
 
+@login_required
 def phong(request):
     data = Phong.objects.all()
     for phong in data:
@@ -304,6 +359,7 @@ def phong(request):
 
     return render(request, './pages/phong.html',context)
 
+@login_required
 def update_phong(request,id):
     data = get_object_or_404(Phong, id=id)
     if request.method == 'POST':
@@ -317,7 +373,7 @@ def update_phong(request,id):
         return redirect(phong)
     return render(request, './pages/update.html',{'data': data})
 
-
+@login_required
 def add_Phong(request):
     # phongs = Phong.objects.all()
     if request.method == 'POST':
