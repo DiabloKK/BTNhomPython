@@ -1,0 +1,70 @@
+{% load static %}
+{% include 'header.html' %}
+
+<div class="container-fluid pt-4 px-4" style="padding-left: 0 !important;">
+    <div class="bg-light rounded p-4">
+        <div class="text-center" style="margin-bottom: 20px !important;">
+            <h6 class="mb-0">{{title}}</h6>
+        </div>
+        {% if message != null %}
+            <div class="mb-3 text-center" style="color: red">
+                <p>{{message}}</P>
+            </div>    
+        {% endif %}
+        <form action="/hopdong_saved" method="post" style="padding: 0 200px !important;">
+            <div class="mb-3">
+                <labe class="form-label">Ngày bắt đầu</label>
+                <input type="date" class="form-control" id="NgayBatDau" name="NgayBatDau" value="{{constract.NgayBatDau|date:'Y-m-d'}}">
+            </div>
+            <div class="mb-3">
+                <labe class="form-label">Ngày kết thúc</label>
+                <input type="date" class="form-control" id="NgayKetThuc" name="NgayKetThuc" value="{{constract.NgayKetThuc|date:'Y-m-d'}}">
+            </div>
+            <div class="mb-3">
+                <labe class="form-label">Giá tiền</label>
+                <input type="text" class="form-control" id="GiaTien" name="GiaTien" value="{{constract.GiaTien}}">
+            </div>
+            <div class="mb-3">
+                <labe class="form-label">Trạng Thái Thanh Toán</label>
+                <!-- <input type="text" class="form-control" id="TrangThaiThanhToan" name="TrangThaiThanhToan" value="{{constract.TrangThaiThanhToan}}"> -->
+                <select class="form-control"  id="TrangThaiThanhToan" name="TrangThaiThanhToan" value="{{constract.TrangThaiThanhToan}}">
+                    <option value="{{constract.TrangThaiThanhToan}}" {% if constract.TrangThaiThanhToan == True %}selected{% endif %}>Hoàn tất</option>                
+                    <option value="{{constract.TrangThaiThanhToan}}" {% if constract.TrangThaiThanhToan == False %}selected{% endif %}>Chưa</option>
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Sinh Viên thuê</label>
+                <select class="form-control"  id="MSSV_id" name="MSSV_id" value="{{constract.MSSV.id}}">
+                    {% for sv in SV_list %}
+                    <option value="{{sv.id}}" {% if constract.MSSV.HoTen == sv.HoTen %}selected{% endif %}>{{sv.HoTen}}</option>                
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Quản lí</label>
+                <select class="form-control"  id="MaQuanLi_id" name="MaQuanLi_id" value="{{constract.MaQuanLi.id}}">
+                    {% for ql in QL_list %}
+                    <option value="{{ql.id}}" {% if constract.MaQuanLi.HoTen == ql.HoTen %}selected{% endif %}>{{ql.HoTen}}</option>                
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Phòng</label>
+                <select class="form-control"  id="MaPhong_id" name="MaPhong_id" value="{{constract.MaPhong.id}}">
+                    {% for room in room_list %}
+                    <option value="{{room.id}}" {% if constract.MaPhong.MaPhong == room.MaPhong %}selected{% endif %}>{{room.MaPhong}}</option>                
+                    {% endfor %}
+                </select>
+            </div>
+            <input type="show" class="form-control" id="id" name="id" value="{{constract.id}}">
+            <div class="mb-3 text-center">
+                <button type="submit" class="btn btn-primary" style="margin-left: 30px">Submit</button>
+            </div>
+            {% csrf_token %}
+            </form>
+        </div>
+    </div>
+</div>
+
+    
+{% include 'footer.html' %}

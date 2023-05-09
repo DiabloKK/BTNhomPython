@@ -1,8 +1,9 @@
 import datetime
 from django.shortcuts import redirect, render
 from django.db.models import Q
-from main.models import QuanLi
+from main.models import QuanLi, HopDong, SinhVien, Phong
 from django.core.paginator import Paginator
+from .forms import HopDongForm
 
 # Create your views here.
 def index(request):
@@ -10,6 +11,71 @@ def index(request):
 
 def profile(request):
     return render(request, 'profile.html')
+
+# Show all the constracts
+def all_constracts(request):
+    constract_list = HopDong.objects.all()
+    room_list = Phong.objects.all()
+    list = {'constract_list' : constract_list}
+    return render(request, 'constracts.html', list)
+
+def search_constracts(request):
+    txt = str(request.POST.get('txt')).strip()
+    constract_list = HopDong.objects.filter(Q(GiaTien_icontains=txt) )
+    list = {'constract_list' : constract_list}
+    return render(request, 'constracts.html', list)
+
+def edit_constract(request, id):
+    constract = HopDong.objects.get(id=id)
+    SV_list = SinhVien.objects.all()
+    QL_list = QuanLi.objects.all()
+    room_list = Phong.objects.all()
+    list = {'SV_list' : SV_list,
+            'constract' : constract,
+            'QL_list' : QL_list,
+            'room_list' : room_list
+            }
+    return render(request, 'constract_detail.html', list)
+
+def add_constract(request):
+    constract_list = HopDong.objects.all()
+    SV_list = SinhVien.objects.all()
+    QL_list = QuanLi.objects.all()
+    room_list = Phong.objects.all()
+    list = {'SV_list' : SV_list,
+            'constract_list' : constract_list,
+            'QL_list' : QL_list,
+            'room_list' : room_list
+            }
+    return render(request, 'constract_detail.html', list)
+
+def constract_saved(request):
+    id = request.POST.get('id')
+    NgayBatDau = str(request.POST.get('NgayBatDau')).strip()
+    NgayKetThuc = str(request.POST.get('NgayKetThuc')).strip()
+    GiaTien = request.POST.get('GiaTien')
+    TrangThaiThanhToan = str(request.POST.get('TrangThaiThanhToan')).strip()
+    if TrangThaiThanhToan == 'Hoàn tất':
+        TrangThaiThanhToan=True
+    else: TrangThaiThanhToan=False
+    MSSV_id = str(request.POST.get('MSSV_id')).strip()
+    MaQuanLi_id = str(request.POST.get('MaQuanLi_id')).strip()
+    MaPhong_id = str(request.POST.get('MaPhong_id')).strip()
+
+    if (id==''):
+        new_constract = HopDong(NgayBatDau=NgayBatDau, NgayKetThuc=NgayKetThuc, GiaTien=GiaTien, TrangThaiThanhToan=TrangThaiThanhToan,MSSV_id=MSSV_id, MaQuanLi_id=MaQuanLi_id, MaPhong_id=MaPhong_id)
+        new_constract.save()
+        return redirect('/themhopdong/')
+    else:
+        new_constract = HopDong(id=id, NgayBatDau=NgayBatDau, NgayKetThuc=NgayKetThuc, GiaTien=GiaTien, TrangThaiThanhToan=TrangThaiThanhToan,MSSV_id=MSSV_id, MaQuanLi_id=MaQuanLi_id, MaPhong_id=MaPhong_id)
+        new_constract.save()
+        form = HopDongForm(request.POST)
+        return redirect('/suahopdong/' + str(id) + '/')
+
+def delete_constract(request, id):
+    constract = HopDong.objects.get(id=id)
+    constract.delete()
+    return all_constracts(request)
 
 def nhanViens(request):
     if request.method == 'GET':

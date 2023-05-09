@@ -2,6 +2,7 @@ from django.db import models
 
 # Create your models here.
 class Phong(models.Model):
+    id = models.IntegerField(primary_key=True)
     MaPhong = models.CharField(max_length=5)
     TrangThai = models.CharField(max_length=50)
     SoluongSV = models.IntegerField()
@@ -12,6 +13,7 @@ class Phong(models.Model):
         db_table = 'Phong'
 
 class SinhVien(models.Model):
+    id = models.IntegerField(primary_key=True)
     MSSV = models.CharField(max_length=50)
     HoTen = models.CharField(max_length=50)
     GioiTinh = models.BooleanField()
@@ -24,6 +26,7 @@ class SinhVien(models.Model):
         db_table = 'SinhVien'
 
 class QuanLi(models.Model):
+    id = models.IntegerField(primary_key=True)
     MaQuanLi = models.CharField(max_length=50)
     HoTen = models.CharField(max_length=50)
     NgaySinh = models.DateField()
