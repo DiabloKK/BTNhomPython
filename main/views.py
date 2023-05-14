@@ -21,10 +21,15 @@ def all_constracts(request):
 
 def search_constracts(request):
     txt = str(request.POST.get('txt')).strip()
-    constract_list = HopDong.objects.filter(Q(GiaTien_icontains=txt) )
-    list = {'constract_list' : constract_list}
-    return render(request, 'constracts.html', list)
-
+    status = str(request.POST.get('status')).strip()
+    if status == "":
+        constract_list = HopDong.objects.filter(Q(GiaTien__icontains=txt) | Q(NgayBatDau__icontains=txt) | Q(NgayKetThuc__icontains=txt))
+        list = {'constract_list' : constract_list}
+        return render(request, 'constracts.html', list)
+    else:
+        constract_list = HopDong.objects.filter(Q(TrangThaiThanhToan__icontains=status))
+        list = {'constract_list' : constract_list}
+        return render(request, 'constracts.html', list)
 def edit_constract(request, id):
     constract = HopDong.objects.get(id=id)
     SV_list = SinhVien.objects.all()
@@ -54,10 +59,7 @@ def constract_saved(request):
     NgayBatDau = str(request.POST.get('NgayBatDau')).strip()
     NgayKetThuc = str(request.POST.get('NgayKetThuc')).strip()
     GiaTien = request.POST.get('GiaTien')
-    TrangThaiThanhToan = str(request.POST.get('TrangThaiThanhToan')).strip()
-    if TrangThaiThanhToan == 'Hoàn tất':
-        TrangThaiThanhToan=True
-    else: TrangThaiThanhToan=False
+    TrangThaiThanhToan = bool(request.POST.get('TrangThaiThanhToan'))
     MSSV_id = str(request.POST.get('MSSV_id')).strip()
     MaQuanLi_id = str(request.POST.get('MaQuanLi_id')).strip()
     MaPhong_id = str(request.POST.get('MaPhong_id')).strip()
