@@ -4,8 +4,9 @@ from main.models import SinhVien
 import datetime
 from django.shortcuts import redirect, render
 from django.db.models import Q
-from main.models import QuanLi
+from main.models import QuanLi, HopDong, SinhVien, Phong
 from django.core.paginator import Paginator
+from .forms import HopDongForm
 from django.contrib.auth import authenticate, login, logout
 from django.http import HttpResponse
 from django.contrib.auth.models import User
@@ -13,10 +14,12 @@ from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
+
 @login_required
 def index(request):
     # QuanLi.objects.all().delete()
     return render(request, 'index.html')
+
 
 def login_view(request):
     if request.method == 'GET':
@@ -24,27 +27,109 @@ def login_view(request):
     elif request.method == 'POST':
         email = str(request.POST.get('email')).strip()
         password = str(request.POST.get('password')).strip()
-        
+
         user = authenticate(request, username=email, password=password)
-        
+
         if user is not None:
             login(request, user)
-            nhanvien = QuanLi.objects.get(Email = email)
+            nhanvien = QuanLi.objects.get(Email=email)
             request.session['role'] = nhanvien.Role
             request.session['name'] = nhanvien.HoTen
             return redirect("/")
         else:
             return render(request, 'login.html', {'message': 'Tài khoản hoặc mật khẩu không chính xác'})
 
+
 def logout_view(request):
     logout(request)
     response = redirect('/login/')
-    
+
     return response
+
 
 @login_required
 def profile(request):
     return render(request, 'profile.html')
+
+# Show all the constracts
+
+
+def all_constracts(request):
+    constract_list = HopDong.objects.all()
+    room_list = Phong.objects.all()
+    list = {'constract_list': constract_list}
+    return render(request, 'constracts.html', list)
+
+
+def search_constracts(request):
+    txt = str(request.POST.get('txt')).strip()
+    status = str(request.POST.get('status')).strip()
+    if status == "":
+        constract_list = HopDong.objects.filter(Q(GiaTien__icontains=txt) | Q(
+            NgayBatDau__icontains=txt) | Q(NgayKetThuc__icontains=txt))
+        list = {'constract_list': constract_list}
+        return render(request, 'constracts.html', list)
+    else:
+        constract_list = HopDong.objects.filter(
+            Q(TrangThaiThanhToan__icontains=status))
+        list = {'constract_list': constract_list}
+        return render(request, 'constracts.html', list)
+
+
+def edit_constract(request, id):
+    constract = HopDong.objects.get(id=id)
+    SV_list = SinhVien.objects.all()
+    QL_list = QuanLi.objects.all()
+    room_list = Phong.objects.all()
+    list = {'SV_list': SV_list,
+            'constract': constract,
+            'QL_list': QL_list,
+            'room_list': room_list
+            }
+    return render(request, 'constract_detail.html', list)
+
+
+def add_constract(request):
+    constract_list = HopDong.objects.all()
+    SV_list = SinhVien.objects.all()
+    QL_list = QuanLi.objects.all()
+    room_list = Phong.objects.all()
+    list = {'SV_list': SV_list,
+            'constract_list': constract_list,
+            'QL_list': QL_list,
+            'room_list': room_list
+            }
+    return render(request, 'constract_detail.html', list)
+
+
+def constract_saved(request):
+    id = request.POST.get('id')
+    NgayBatDau = str(request.POST.get('NgayBatDau')).strip()
+    NgayKetThuc = str(request.POST.get('NgayKetThuc')).strip()
+    GiaTien = request.POST.get('GiaTien')
+    TrangThaiThanhToan = bool(request.POST.get('TrangThaiThanhToan'))
+    MSSV_id = str(request.POST.get('MSSV_id')).strip()
+    MaQuanLi_id = str(request.POST.get('MaQuanLi_id')).strip()
+    MaPhong_id = str(request.POST.get('MaPhong_id')).strip()
+
+    if (id == ''):
+        new_constract = HopDong(NgayBatDau=NgayBatDau, NgayKetThuc=NgayKetThuc, GiaTien=GiaTien,
+                                TrangThaiThanhToan=TrangThaiThanhToan, MSSV_id=MSSV_id, MaQuanLi_id=MaQuanLi_id, MaPhong_id=MaPhong_id)
+        new_constract.save()
+        return redirect('/themhopdong/')
+    else:
+        new_constract = HopDong(id=id, NgayBatDau=NgayBatDau, NgayKetThuc=NgayKetThuc, GiaTien=GiaTien,
+                                TrangThaiThanhToan=TrangThaiThanhToan, MSSV_id=MSSV_id, MaQuanLi_id=MaQuanLi_id, MaPhong_id=MaPhong_id)
+        new_constract.save()
+        form = HopDongForm(request.POST)
+        return redirect('/suahopdong/' + str(id) + '/')
+
+
+def delete_constract(request, id):
+    constract = HopDong.objects.get(id=id)
+    constract.delete()
+    return all_constracts(request)
+
 
 @login_required
 def sinhviens(request):
@@ -87,12 +172,14 @@ def sinhviens(request):
 
     return render(request, 'sinhvien.html', context)
 
+
 @login_required
 def sinhvien_detail(request, id):
     sinhvien = SinhVien.objects.filter(id=id)[0]
     sinhvien.NgaySinh = sinhvien.NgaySinh.strftime("%Y-%m-%d")
     context = {"sinhvien": sinhvien}
     return render(request, 'sinhvien_detail.html', context)
+
 
 @login_required
 def update_sinhvien(request, id):
@@ -115,6 +202,7 @@ def update_sinhvien(request, id):
     # Render the update SinhVien form with the current data for the SinhVien object
     return render(request, 'sinhvien_detail.html', {'sinhvien': sinhvien})
 
+
 @login_required
 def add_sinhvien(request):
     if request.method == 'POST':
@@ -133,13 +221,14 @@ def add_sinhvien(request):
     phongs = Phong.objects.all()
     return render(request, 'add_sinhvien.html', {'phongs': phongs})
 
+
 @login_required
 def nhanViens(request):
     role = request.session['role']
-    
+
     if role != 'ADMIN':
         return redirect("/")
-    
+
     sort = request.GET.get('sort')
     keyword = request.GET.get('keyword', '')
     if sort == None:
@@ -189,13 +278,14 @@ def nhanViens(request):
 
     return render(request, 'nhanviens.html', context)
 
+
 @login_required
 def nhanVien(request, id):
     role = request.session['role']
-    
+
     if role != 'ADMIN':
         return redirect("/")
-    
+
     data = {}
     if id == 0:
         data['title'] = "Thêm nhân viên"
@@ -216,13 +306,14 @@ def nhanVien(request, id):
         del request.session['nhanvien']
     return render(request, 'nhanvien.html', data)
 
+
 @login_required
 def nhanVien_save(request):
     role = request.session['role']
-    
+
     if role != 'ADMIN':
         return redirect("/")
-    
+
     # Nhận dữ liệu
     name = str(request.POST.get('name')).strip()
     birthday = str(request.POST.get('birthday')).strip()
@@ -277,12 +368,12 @@ def nhanVien_save(request):
         nhanvien = QuanLi(MaQuanLi=maQuanLi, HoTen=name, NgaySinh=birthday,
                           SoDienThoai=phone, Email=email, Role=role)
         nhanvien.save()
-        
+
         # tạo user mới
         user = User.objects.create_user(email, email, '123456')
         # lưu user vào database
         user.save()
-        
+
         request.session['message'] = 'Đã thêm thành công!'
         return redirect('/nhanvien/' + str(id) + "/")
     else:
@@ -311,16 +402,18 @@ def nhanVien_save(request):
         nhanvien.save()
         return redirect('/nhanviens/')
 
+
 @login_required
 def nhanVien_delete(request, id):
     role = request.session['role']
-    
+
     if role != 'ADMIN':
         return redirect("/")
-    
+
     nhanvien = QuanLi.objects.get(id=id)
     nhanvien.delete()
     return nhanViens(request)
+
 
 @login_required
 def phong(request):
@@ -360,8 +453,9 @@ def phong(request):
 
     return render(request, './pages/phong.html', context)
 
+
 @login_required
-def update_phong(request,id):
+def update_phong(request, id):
     data = get_object_or_404(Phong, id=id)
     if request.method == 'POST':
         data.MaPhong = request.POST['MaPhong']
@@ -373,6 +467,7 @@ def update_phong(request,id):
         data.save()
         return redirect(phong)
     return render(request, './pages/update.html', {'data': data})
+
 
 @login_required
 def add_Phong(request):
