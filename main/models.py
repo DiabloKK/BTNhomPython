@@ -1,6 +1,8 @@
 from django.db import models
 
 # Create your models here.
+
+
 class Phong(models.Model):
     id = models.IntegerField(primary_key=True)
     MaPhong = models.CharField(max_length=5)
@@ -9,8 +11,10 @@ class Phong(models.Model):
     LoaiPhong = models.CharField(max_length=50)
     Gia = models.IntegerField()
     TenToaNha = models.CharField(max_length=50)
+
     class Meta:
         db_table = 'Phong'
+
 
 class SinhVien(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -22,8 +26,10 @@ class SinhVien(models.Model):
     Email = models.CharField(max_length=255)
     SoDienThoai = models.CharField(max_length=10)
     MaPhong = models.ForeignKey(Phong, on_delete=models.CASCADE)
+
     class Meta:
         db_table = 'SinhVien'
+
 
 class QuanLi(models.Model):
     id = models.IntegerField(primary_key=True)
@@ -32,10 +38,11 @@ class QuanLi(models.Model):
     NgaySinh = models.DateField()
     SoDienThoai = models.CharField(max_length=10)
     Email = models.CharField(max_length=100)
-    Password = models.CharField(max_length=100)
     Role = models.CharField(max_length=50)
+
     class Meta:
-        db_table = 'QuanLi'
+        db_table = 'NhanVien'
+
 
 class HopDong(models.Model):
     NgayBatDau = models.DateField()
@@ -45,5 +52,6 @@ class HopDong(models.Model):
     MSSV = models.ForeignKey(SinhVien, on_delete=models.CASCADE)
     MaQuanLi = models.ForeignKey(QuanLi, on_delete=models.CASCADE)
     MaPhong = models.ForeignKey(Phong, on_delete=models.CASCADE)
+
     class Meta:
         db_table = 'HopDong'

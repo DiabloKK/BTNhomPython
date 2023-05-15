@@ -1,0 +1,55 @@
+{% load static %} {% include 'header.html' %}
+<!-- Recent Sales Start -->
+<form action="/sinhviens/{{sinhvien.id}}/update/" method="post" class="col-sm-12 col-xl-10 mt-5">
+    {% csrf_token %}
+    <div class="bg-light rounded h-100 p-4">
+        <h6 class="mb-4">Thông tin sinh viên</h6>
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" value="{{sinhvien.HoTen}}" name="hoten" />
+            <label for="floatingInput">Họ và tên</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input type="email" class="form-control" value="{{sinhvien.Email}}" name="email" />
+            <label for="floatingInput">Email address</label>
+        </div>
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" value="{{sinhvien.DiaChi}}" name="diachi" />
+            <label for="floatingInput">Địa chỉ</label>
+        </div>
+        <div class="form-floating mb-3">
+            <select class="form-select" name="gioitinh" aria-label="Giới tính">
+                <option value="1">Nam</option>
+                <option value="0">Nữ</option>
+            </select>
+            <label for="floatingSelect">Giới tính</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <select class="form-select" name="maphong" aria-label="Giới tính">
+                <option value="1">Phòng 001</option>
+                <option value="2">Phòng 002</option>
+            </select>
+            <label for="floatingSelect">Phòng</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input type="text" class="form-control" name="ngaysinh" value="{{sinhvien.NgaySinh}}" />
+            <label for="floatingInput">Ngày sinh</label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <input
+                type="text"
+                class="form-control"
+                name="sodienthoai"
+                value="{{sinhvien.SoDienThoai}}"
+            />
+            <label for="floatingInput">Số điện thoại</label>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Update</button>
+    </div>
+</form>
+<!-- Recent Sales End -->
+
+{% include 'footer.html' %}
