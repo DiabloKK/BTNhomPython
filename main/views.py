@@ -35,6 +35,7 @@ def login_view(request):
             nhanvien = QuanLi.objects.get(Email=email)
             request.session['role'] = nhanvien.Role
             request.session['name'] = nhanvien.HoTen
+            request.session['id'] = nhanvien.id
             return redirect("/")
         else:
             return render(request, 'login.html', {'message': 'Tài khoản hoặc mật khẩu không chính xác'})
@@ -53,6 +54,25 @@ def profile(request):
 
 # Show all the constracts
 
+def change_password(request):
+
+    if request.method == 'POST':
+        user = request.user
+        print(user)
+        if user.check_password(request.POST.get('password_older')):
+            if request.POST.get('new_password')  == request.POST.get('repeat_new_password'):
+                user.set_password(request.POST.get('new_password'))
+                user.save()
+                return redirect('/login/')
+            else:
+                return render(request, 'changepassword.html',{
+                    'message': "Mật khẩu mới không trùng khớp"
+                })
+        else:
+            return render(request, 'changepassword.html',{
+                    'message': "Mật khẩu không trùng khớp"
+                })
+    return render(request, 'changepassword.html')
 
 def all_constracts(request):
     constract_list = HopDong.objects.all()
@@ -133,9 +153,15 @@ def delete_constract(request, id):
 
 @login_required
 def sinhviens(request):
+
     query = request.GET.get('q', '')
     phong = request.GET.get('rid', '')
-    sinhviens = SinhVien.objects.filter(HoTen__icontains=query, MaPhong=phong)
+    if phong != '':
+        sinhviens = SinhVien.objects.filter(
+            HoTen__icontains=query, MaPhong=phong)
+    else:
+        sinhviens = SinhVien.objects.filter(
+            HoTen__icontains=query)
     # context = {"sinhviens": sinhviens}
 
     # Tạo một đối tượng Paginator với all_records và số lượng bản ghi mỗi trang
@@ -206,6 +232,17 @@ def update_sinhvien(request, id):
 @login_required
 def add_sinhvien(request):
     if request.method == 'POST':
+
+        phong = Phong.objects.filter(id=request.POST['maphong'])
+
+        so_sinh_vien = SinhVien.objects.filter(
+            MaPhong_id=request.POST['maphong']).count()
+        print(so_sinh_vien)
+        if so_sinh_vien >= phong[0].SoluongSV:
+            phongs = Phong.objects.all()
+
+            return render(request, 'add_sinhvien.html', {'phongs': phongs, 'error': "Phòng đầy"})
+
         sinhvien = SinhVien(HoTen=request.POST['hoten'],
                             MSSV=request.POST['mssv'],
                             GioiTinh=request.POST['gioitinh'],
@@ -218,7 +255,9 @@ def add_sinhvien(request):
         sinhvien.save()
 
         return redirect(sinhviens)
+
     phongs = Phong.objects.all()
+
     return render(request, 'add_sinhvien.html', {'phongs': phongs})
 
 
@@ -417,14 +456,24 @@ def nhanVien_delete(request, id):
 
 @login_required
 def phong(request):
-    data = Phong.objects.all()
-    for phong in data:
+
+    keyword = request.GET.get('keyword', '')
+    if request.method == 'POST':
+        txt = str(request.POST.get('txt')).strip()
+        keyword = txt
+
+    Phongs = Phong.objects.filter(Q(MaPhong__icontains=keyword) | Q(TrangThai__icontains=keyword) | Q(
+        SoluongSV__icontains=keyword) | Q(LoaiPhong__icontains=keyword) | Q(Gia__icontains=keyword))
+
+
+    # data = Phong.objects.all()
+    for phong in Phongs:
         sinh_vien = SinhVien.objects.filter(MaPhong_id=phong.id)
         so_luong = sinh_vien.count()
         phong.count = so_luong
 
     # Tạo một đối tượng Paginator với all_records và số lượng bản ghi mỗi trang
-    paginator = Paginator(data, 3)
+    paginator = Paginator(Phongs, 3)
 
     # Lấy số trang từ query parameter (nếu không có sẽ trả về trang đầu tiên)
     page_number = int(request.GET.get('page', 1))
@@ -433,7 +482,7 @@ def phong(request):
     data_page = paginator.get_page(page_number)
 
     # Tìm số page chia được
-    totaldata = len(data)
+    totaldata = len(Phongs)
     if totaldata % 3 == 0:
         total_page = int(totaldata/3)
     else:
@@ -449,6 +498,8 @@ def phong(request):
         'totalPage': total_page,
         'numbers': numbers,
         'totaldata': totaldata,
+        'keyword': keyword
+
     }
 
     return render(request, './pages/phong.html', context)
@@ -473,7 +524,7 @@ def update_phong(request, id):
 def add_Phong(request):
     # phongs = Phong.objects.all()
     if request.method == 'POST':
-        Phong.create_Phong(
+        Phong(
             request.POST['MaPhong'],
             request.POST['TrangThai'],
             request.POST['SoluongSV'],
