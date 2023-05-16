@@ -4,21 +4,21 @@
     <div class="bg-light rounded h-100 p-4">
         <h6 class="mb-4">Thông tin sinh viên</h6>
         <div class="form-floating mb-3">
-            <input type="text" class="form-control" name="hoten" />
+            <input required type="text" class="form-control" name="hoten" />
             <label for="floatingInput">Họ và tên</label>
         </div>
 
         <div class="form-floating mb-3">
-            <input type="text" class="form-control" name="mssv" />
+            <input required type="text" class="form-control" name="mssv" />
             <label for="floatingInput">MSSV</label>
         </div>
 
         <div class="form-floating mb-3">
-            <input type="email" class="form-control" name="email" />
+            <input required type="email" class="form-control" name="email" />
             <label for="floatingInput">Email address</label>
         </div>
         <div class="form-floating mb-3">
-            <input type="text" class="form-control" name="diachi" />
+            <input required type="text" class="form-control" name="diachi" />
             <label for="floatingInput">Địa chỉ</label>
         </div>
         <div class="form-floating mb-3">
@@ -38,16 +38,18 @@
         </div>
 
         <div class="form-floating mb-3">
-            <input type="date" class="form-control" name="ngaysinh" />
+            <input required type="date" class="form-control" name="ngaysinh" />
             <label for="floatingInput">Ngày sinh</label>
         </div>
 
         <div class="form-floating mb-3">
-            <input type="text" class="form-control" name="sodienthoai" />
+            <input required type="text" class="form-control" name="sodienthoai" />
             <label for="floatingInput">Số điện thoại</label>
         </div>
 
         <button type="submit" class="btn btn-primary">Thêm</button>
+
+        <div class="mt-4 text-danger">{{error}}</div>
     </div>
 </form>
 
