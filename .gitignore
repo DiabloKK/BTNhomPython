@@ -2,3 +2,4 @@
 /QLKTX/__pycache__
 /main/migrations
 db.sqlite3
+__pycache__
