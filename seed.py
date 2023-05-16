@@ -1,9 +1,9 @@
 from main.models import Phong, SinhVien
 from datetime import date
 # Create 5 Phong objects
-p1 = Phong(MaPhong='P001', TrangThai='available', SoluongSV=4,
+p1 = Phong(MaPhong='P001', TrangThai=True, SoluongSV=4,
            LoaiPhong='double', Gia=200, TenToaNha='Toa nha A')
-p2 = Phong(MaPhong='P002', TrangThai='available', SoluongSV=2,
+p2 = Phong(MaPhong='P002', TrangThai=True, SoluongSV=2,
            LoaiPhong='single', Gia=150, TenToaNha='Toa nha A')
 p3 = Phong(MaPhong='P003', TrangThai='unavailable', SoluongSV=6,
            LoaiPhong='double', Gia=250, TenToaNha='Toa nha B')

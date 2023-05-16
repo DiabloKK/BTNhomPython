@@ -135,7 +135,12 @@ def delete_constract(request, id):
 def sinhviens(request):
     query = request.GET.get('q', '')
     phong = request.GET.get('rid', '')
-    sinhviens = SinhVien.objects.filter(HoTen__icontains=query, MaPhong=phong)
+    if phong != '':
+        sinhviens = SinhVien.objects.filter(
+            HoTen__icontains=query, MaPhong=phong)
+    else:
+        sinhviens = SinhVien.objects.filter(
+            HoTen__icontains=query)
     # context = {"sinhviens": sinhviens}
 
     # Tạo một đối tượng Paginator với all_records và số lượng bản ghi mỗi trang
@@ -206,6 +211,17 @@ def update_sinhvien(request, id):
 @login_required
 def add_sinhvien(request):
     if request.method == 'POST':
+
+        phong = Phong.objects.filter(id=request.POST['maphong'])
+
+        so_sinh_vien = SinhVien.objects.filter(
+            MaPhong_id=request.POST['maphong']).count()
+        print(so_sinh_vien)
+        if so_sinh_vien >= phong[0].SoluongSV:
+            phongs = Phong.objects.all()
+
+            return render(request, 'add_sinhvien.html', {'phongs': phongs, 'error': "Phòng đầy"})
+
         sinhvien = SinhVien(HoTen=request.POST['hoten'],
                             MSSV=request.POST['mssv'],
                             GioiTinh=request.POST['gioitinh'],
@@ -218,7 +234,9 @@ def add_sinhvien(request):
         sinhvien.save()
 
         return redirect(sinhviens)
+
     phongs = Phong.objects.all()
+
     return render(request, 'add_sinhvien.html', {'phongs': phongs})
 
 
