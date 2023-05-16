@@ -113,16 +113,25 @@
                                 <a href="/sinhviens/add" class="dropdown-item">Thêm sinh viên</a>
                             </div>
                         </div>
-                        {% if request.session.role == 'ADMIN' %}
-                            <div class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
-                                    ><i class="fa fa-laptop me-2"></i>Quản lý Nhân Viên</a
-                                >
-                                <div class="dropdown-menu bg-transparent border-0">
-                                    <a href="/nhanviens" class="dropdown-item">Danh sách Nhân viên</a>
-                                    <a href="/nhanvien/0" class="dropdown-item">Thêm Nhân viên</a>
-                                </div>
+                        <div class="nav-item dropdown">
+                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
+                                ><i class="fa fa-laptop me-2"></i>Quản lý Hợp Đồng</a
+                            >
+                            <div class="dropdown-menu bg-transparent border-0">
+                                <a href="/hopdong" class="dropdown-item">Danh sách Hợp Đồng</a>
+                                <a href="/nhanvien/0" class="dropdown-item">Thêm Hợp đồng</a>
                             </div>
+                        </div>
+                        {% if request.session.role == 'ADMIN' %}
+                        <div class="nav-item dropdown">
+                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
+                                ><i class="fa fa-laptop me-2"></i>Quản lý Nhân Viên</a
+                            >
+                            <div class="dropdown-menu bg-transparent border-0">
+                                <a href="/nhanviens" class="dropdown-item">Danh sách Nhân viên</a>
+                                <a href="/nhanvien/0" class="dropdown-item">Thêm Nhân viên</a>
+                            </div>
+                        </div>
                         {% endif %}
                     </div>
                 </nav>
@@ -232,7 +241,9 @@
                                     alt=""
                                     style="width: 40px; height: 40px"
                                 />
-                                <span class="d-none d-lg-inline-flex">{{request.session.name}}</span>
+                                <span class="d-none d-lg-inline-flex"
+                                    >{{request.session.name}}</span
+                                >
                             </a>
                             <div
                                 class="dropdown-menu dropdown-menu-end bg-light border-0 rounded-0 rounded-bottom m-0"
