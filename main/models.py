@@ -6,7 +6,7 @@ from django.db import models
 class Phong(models.Model):
     id = models.IntegerField(primary_key=True)
     MaPhong = models.CharField(max_length=5)
-    TrangThai = models.CharField(max_length=50)
+    TrangThai = models.BooleanField(max_length=50)
     SoluongSV = models.IntegerField()
     LoaiPhong = models.CharField(max_length=50)
     Gia = models.IntegerField()
