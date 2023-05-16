@@ -7,9 +7,13 @@ def init():
     all_phong = Phong.objects.all()
     all_sv = SinhVien.objects.all()
     all_ql = QuanLi.objects.all()
+    all_user = User.objects.all()
+    all_con = HopDong.objects.all()
+    all_user.delete()
     all_phong.delete()
     all_sv.delete()
     all_ql.delete()
+    all_con.delete()
 
     # Create 5 Phong objects
     Phong.objects.create(MaPhong='P001', TrangThai=True, SoluongSV=4,
@@ -83,22 +87,22 @@ def init():
     )
 
     QuanLi.objects.create(id=1, MaQuanLi='QL001', HoTen='Nguyen Van A', NgaySinh=date(
-        1980, 1, 1), SoDienThoai='0987654321', Email='nguyenvana@example.com', Role='Admin')
+        1980, 1, 1), SoDienThoai='0987654321', Email='nguyenvana@gmail.com', Role='Admin')
 
     QuanLi.objects.create(MaQuanLi='QL001', HoTen='Le Anh', NgaySinh=date(
-        1990, 2, 2), SoDienThoai='0123456789', Email='anh@example.com', Role='ADMIN')
+        1990, 2, 2), SoDienThoai='0123456789', Email='anh@gmail.com', Role='ADMIN')
     QuanLi.objects.create(MaQuanLi='QL002', HoTen='Duong Bao', NgaySinh=date(
-        1990, 2, 2), SoDienThoai='0123456789', Email='bao@example.com', Role='ADMIN')
+        1990, 2, 2), SoDienThoai='0123456789', Email='bao@gmail.com', Role='ADMIN')
     QuanLi.objects.create(MaQuanLi='QL003', HoTen='Vo Khang', NgaySinh=date(
-        1990, 2, 2), SoDienThoai='0123456789', Email='khang@example.com', Role='ADMIN')
+        1990, 2, 2), SoDienThoai='0123456789', Email='khang@gmail.com', Role='ADMIN')
     QuanLi.objects.create(MaQuanLi='QL004', HoTen='Hoang Long', NgaySinh=date(
-        1990, 2, 2), SoDienThoai='0123456789', Email='long@example.com', Role='ADMIN')
+        1990, 2, 2), SoDienThoai='0123456789', Email='long@gmail.com', Role='ADMIN')
     QuanLi.objects.create(MaQuanLi='QL005', HoTen='Pham Van C', NgaySinh=date(
-        2000, 3, 3), SoDienThoai='0912345678', Email='phamvanc@example.com', Role='NORMAL')
+        2000, 3, 3), SoDienThoai='0912345678', Email='phamvanc@gmail.com', Role='NORMAL')
     QuanLi.objects.create(MaQuanLi='QL006', HoTen='Le Thi D', NgaySinh=date(
-        1970, 4, 4), SoDienThoai='0845678901', Email='lethid@example.com', Role='NORMAL')
+        1970, 4, 4), SoDienThoai='0845678901', Email='lethid@gmail.com', Role='NORMAL')
     QuanLi.objects.create(MaQuanLi='QL007', HoTen='Hoang Van E', NgaySinh=date(
-        1985, 5, 5), SoDienThoai='0777777777', Email='hoangvane@example.com', Role='Admin')
+        1985, 5, 5), SoDienThoai='0777777777', Email='hoangvane@gmail.com', Role='Admin')
 
     User.objects.create_user('anh@gmail.com', 'anh@gmail.com', '123456')
 
