@@ -28,14 +28,16 @@
                 <labe class="form-label">Email</label>
                 <input type="email" class="form-control" id="email" name="email" value="{{nhanvien.Email}}">
             </div>
-            <div class="mb-3">
-                <labe class="form-label">Role</label>
-                <select class="form-control"  id="role" name="role" value="{{nhanvien.Role}}">
-                    <option value="">-- Select role --</option>
-                    <option value="ADMIN" {% if nhanvien.Role == "ADMIN" %}selected{% endif %}>Admin</option>
-                    <option value="NORMAL" {% if nhanvien.Role == "NORMAL" %}selected{% endif %}>Normal</option>
-                </select>
-            </div>
+            {% if request.session.role == 'ADMIN'%}
+                <div class="mb-3">
+                    <labe class="form-label">Role</label>
+                    <select class="form-control"  id="role" name="role" value="{{nhanvien.Role}}">
+                        <option value="">-- Select role --</option>
+                        <option value="ADMIN" {% if nhanvien.Role == "ADMIN" %}selected{% endif %}>Admin</option>
+                        <option value="NORMAL" {% if nhanvien.Role == "NORMAL" %}selected{% endif %}>Normal</option>
+                    </select>
+                </div>
+            {% endif %}
             {% if request.session.id == nhanvien.id %}
                 <a href="{% url 'change_password' %}">Đổi mật khẩu</a>
             {% endif %}

@@ -105,6 +105,12 @@ def init():
         1985, 5, 5), SoDienThoai='0777777777', Email='hoangvane@gmail.com', Role='Admin')
 
     User.objects.create_user('anh@gmail.com', 'anh@gmail.com', '123456')
+    User.objects.create_user('bao@gmail.com', 'bao@gmail.com', '123456')
+    User.objects.create_user('khang@gmail.com', 'khang@gmail.com', '123456')
+    User.objects.create_user('long@gmail.com', 'long@gmail.com', '123456')
+    User.objects.create_user('phamvanc@gmail.com', 'phamvanc@gmail.com', '123456')
+    User.objects.create_user('lethid@gmail.com', 'lethid@gmail.com', '123456')
+    User.objects.create_user('hoangvane@gmail.com', 'hoangvane@gmail.com', '123456')
 
     sinhviens = SinhVien.objects.all()
     ql = QuanLi.objects.all()[0]

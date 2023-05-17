@@ -322,12 +322,19 @@ def nhanViens(request):
 def nhanVien(request, id):
     role = request.session['role']
 
-    if role != 'ADMIN':
+    profile = int(request.GET.get('profile', 0))
+
+    if role != 'ADMIN' and profile == 0:
         return redirect("/")
 
+
     data = {}
+    
+    data['profile'] = profile
+    
     if id == 0:
         data['title'] = "Thêm nhân viên"
+        data['id'] = 0
     else:
         data['title'] = "Thay đổi thông tin nhân viên"
         nhanvien = QuanLi.objects.get(id=id)
