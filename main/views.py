@@ -455,7 +455,11 @@ def nhanVien_delete(request, id):
 
     nhanvien = QuanLi.objects.get(id=id)
     nhanvien.delete()
-    return nhanViens(request)
+    
+    user = User.objects.get(username = nhanvien.Email)
+    user.delete()
+    
+    return redirect('/nhanviens/')
 
 
 @login_required
