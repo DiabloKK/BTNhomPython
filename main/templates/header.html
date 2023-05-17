@@ -84,11 +84,11 @@
                         </div>
                     </div>
                     <div class="navbar-nav w-100">
-                        <a href="/" class="nav-item nav-link active"
+                        <a href="/" class="nav-item nav-link {% if choose == 'dashboard' %}active{% endif %}"
                             ><i class="fa fa-tachometer-alt me-2"></i>Dashboard</a
                         >
                         <div class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
+                            <a href="#" class="nav-link dropdown-toggle {% if choose == 'phong' %}active{% endif %}" data-bs-toggle="dropdown"
                                 ><i class="fa fa-laptop me-2"></i>Quản lý Phòng</a
                             >
                             <div class="dropdown-menu bg-transparent border-0">
@@ -97,7 +97,7 @@
                             </div>
                         </div>
                         <div class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
+                            <a href="#" class="nav-link dropdown-toggle {% if choose == 'sinhvien' %}active{% endif %}" data-bs-toggle="dropdown"
                                 ><i class="fa fa-laptop me-2"></i>Quản lý Sinh Viên</a
                             >
                             <div class="dropdown-menu bg-transparent border-0">
@@ -106,17 +106,16 @@
                             </div>
                         </div>
                         <div class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
+                            <a href="#" class="nav-link dropdown-toggle {% if choose == 'hopdong' %}active{% endif %}" data-bs-toggle="dropdown"
                                 ><i class="fa fa-laptop me-2"></i>Quản lý Hợp Đồng</a
                             >
                             <div class="dropdown-menu bg-transparent border-0">
                                 <a href="/hopdong" class="dropdown-item">Danh sách Hợp Đồng</a>
-                                <a href="/nhanvien/0" class="dropdown-item">Thêm Hợp đồng</a>
                             </div>
                         </div>
                         {% if request.session.role == 'ADMIN' %}
                         <div class="nav-item dropdown">
-                            <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown"
+                            <a href="#" class="nav-link dropdown-toggle {% if choose == 'nhanvien' %}active{% endif %}" data-bs-toggle="dropdown"
                                 ><i class="fa fa-laptop me-2"></i>Quản lý Nhân Viên</a
                             >
                             <div class="dropdown-menu bg-transparent border-0">
