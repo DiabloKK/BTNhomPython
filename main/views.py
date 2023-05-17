@@ -18,7 +18,7 @@ def index(request):
     # QuanLi.objects.all().delete()
     return render(request, 'index.html')
 
-def login_view(request):
+def login_view(request):    
     if request.method == 'GET':
         return render(request, 'login.html')
     elif request.method == 'POST':
