@@ -47,13 +47,8 @@ def logout_view(request):
 
     return response
 
-
-@login_required
-def profile(request):
-    return render(request, 'profile.html')
-
 # Show all the constracts
-
+@login_required
 def change_password(request):
 
     if request.method == 'POST':
@@ -74,13 +69,14 @@ def change_password(request):
                 })
     return render(request, 'changepassword.html')
 
+@login_required
 def all_constracts(request):
     constract_list = HopDong.objects.all()
     room_list = Phong.objects.all()
     list = {'constract_list': constract_list}
     return render(request, 'constracts.html', list)
 
-
+@login_required
 def search_constracts(request):
     txt = str(request.POST.get('txt')).strip()
     status = str(request.POST.get('status')).strip()
@@ -95,7 +91,7 @@ def search_constracts(request):
         list = {'constract_list': constract_list}
         return render(request, 'constracts.html', list)
 
-
+@login_required
 def edit_constract(request, id):
     constract = HopDong.objects.get(id=id)
     SV_list = SinhVien.objects.all()
@@ -108,7 +104,7 @@ def edit_constract(request, id):
             }
     return render(request, 'constract_detail.html', list)
 
-
+@login_required
 def add_constract(request):
     constract_list = HopDong.objects.all()
     SV_list = SinhVien.objects.all()
@@ -121,7 +117,7 @@ def add_constract(request):
             }
     return render(request, 'constract_detail.html', list)
 
-
+@login_required
 def constract_saved(request):
     id = request.POST.get('id')
     NgayBatDau = str(request.POST.get('NgayBatDau')).strip()
@@ -145,6 +141,7 @@ def constract_saved(request):
         return redirect('/suahopdong/' + str(id) + '/')
 
 
+@login_required
 def delete_constract(request, id):
     constract = HopDong.objects.get(id=id)
     constract.delete()
@@ -379,12 +376,19 @@ def nhanViens(request):
 def nhanVien(request, id):
     role = request.session['role']
 
-    if role != 'ADMIN':
+    profile = int(request.GET.get('profile', 0))
+
+    if role != 'ADMIN' and profile == 0:
         return redirect("/")
 
+
     data = {}
+    
+    data['profile'] = profile
+    
     if id == 0:
         data['title'] = "Thêm nhân viên"
+        data['id'] = 0
     else:
         data['title'] = "Thay đổi thông tin nhân viên"
         nhanvien = QuanLi.objects.get(id=id)
