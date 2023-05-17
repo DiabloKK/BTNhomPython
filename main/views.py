@@ -102,6 +102,7 @@ def edit_constract(request, id):
             'QL_list': QL_list,
             'room_list': room_list
             }
+    # sinhvien = SinhVien.objects.get(id=id)
     return render(request, 'constract_detail.html', list)
 
 @login_required
@@ -517,19 +518,20 @@ def nhanVien_delete(request, id):
 
 @login_required
 def phong(request):
-
+    trangthai =  request.POST.get('trangthai')
+    print(trangthai)
     keyword = request.GET.get('keyword', '')
     if request.method == 'POST':
         txt = str(request.POST.get('txt')).strip()
         keyword = txt
-
-    Phongs = Phong.objects.filter(Q(MaPhong__icontains=keyword) | Q(TrangThai__icontains=keyword) | Q(
+   
+    if trangthai != None:
+        Phongs = Phong.objects.filter(TrangThai=False)
+    else:
+        Phongs = Phong.objects.filter(Q(MaPhong__icontains=keyword) | Q(TrangThai__icontains=keyword) | Q(
         SoluongSV__icontains=keyword) | Q(LoaiPhong__icontains=keyword) | Q(Gia__icontains=keyword))
-
-    
-
-
-    # data = Phong.objects.all()
+    # Tạo một đối tượng Paginator với all_records và số lượng bản ghi mỗi trang
+     # data = Phong.objects.all()
     for phong in Phongs:
         so_luong = SinhVien.objects.filter(MaPhong_id=phong.id).count()
         phong.count = so_luong
@@ -538,8 +540,6 @@ def phong(request):
         else: 
             phong.TrangThai = False
         phong.save()
-
-    # Tạo một đối tượng Paginator với all_records và số lượng bản ghi mỗi trang
     paginator = Paginator(Phongs, 3)
 
     # Lấy số trang từ query parameter (nếu không có sẽ trả về trang đầu tiên)
@@ -557,6 +557,8 @@ def phong(request):
 
     index = (page_number - 1)*3
     numbers = list(range(1, total_page+1))
+
+        
 
     context = {
         'data': data_page,
@@ -577,7 +579,6 @@ def update_phong(request, id):
     data = get_object_or_404(Phong, id=id)
     if request.method == 'POST':
         data.MaPhong = request.POST['MaPhong']
-        data.TrangThai = request.POST['TrangThai']
         data.SoluongSV = request.POST['SoluongSV']
         data.LoaiPhong = request.POST['LoaiPhong']
         data.Gia = request.POST['Gia']
@@ -591,13 +592,14 @@ def update_phong(request, id):
 def add_Phong(request):
     # phongs = Phong.objects.all()
     if request.method == 'POST':
-        Phong(
+        Phong.create_Phong(
             request.POST['MaPhong'],
-            request.POST['TrangThai'],
+            False,
             request.POST['SoluongSV'],
             request.POST['LoaiPhong'],
             request.POST['Gia'],
             request.POST['TenToaNha']
         )
+
         return redirect(phong)
     return render(request, './pages/add.html')
