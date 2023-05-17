@@ -37,7 +37,7 @@
                         <th scope="col">Trạng thái thanh toán</th>
                         <th scope="col">Sinh viên thuê</th>
                         <th scope="col">Quản lí</th>
-                        <th scope="col">Phòng</th>
+                        <!-- <th scope="col">Phòng</th> -->
                         <th scope="col"></th>
                         <th scope="col"></th>
                     </tr>
@@ -52,7 +52,7 @@
                         <td>{% if constract.TrangThaiThanhToan == True %} Hoàn tất {% else %} Chưa {% endif %}</td>
                         <td>{{constract.MSSV.HoTen}}</td>
                         <td>{{constract.MaQuanLi.HoTen}}</td>
-                        <td>{{constract.MaPhong.MaPhong}}</td>
+                        <!-- <td>{{constract.MaPhong.MaPhong}}</td> -->
                         <td><a class="btn btn-sm btn-primary" href="/suahopdong/{{constract.id}}">Sửa</a></td>
                         <td><a class="btn btn-sm btn-danger" href="/hopdong_delete/{{constract.id}}">Xóa</a></td>
                     </tr>
