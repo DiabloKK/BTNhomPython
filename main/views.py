@@ -48,6 +48,8 @@ def logout_view(request):
     return response
 
 # Show all the constracts
+
+
 @login_required
 def change_password(request):
 
@@ -55,19 +57,20 @@ def change_password(request):
         user = request.user
         print(user)
         if user.check_password(request.POST.get('password_older')):
-            if request.POST.get('new_password')  == request.POST.get('repeat_new_password'):
+            if request.POST.get('new_password') == request.POST.get('repeat_new_password'):
                 user.set_password(request.POST.get('new_password'))
                 user.save()
                 return redirect('/login/')
             else:
-                return render(request, 'changepassword.html',{
+                return render(request, 'changepassword.html', {
                     'message': "Mật khẩu mới không trùng khớp"
                 })
         else:
-            return render(request, 'changepassword.html',{
-                    'message': "Mật khẩu không trùng khớp"
-                })
+            return render(request, 'changepassword.html', {
+                'message': "Mật khẩu không trùng khớp"
+            })
     return render(request, 'changepassword.html')
+
 
 @login_required
 def all_constracts(request):
@@ -75,6 +78,7 @@ def all_constracts(request):
     room_list = Phong.objects.all()
     list = {'constract_list': constract_list}
     return render(request, 'constracts.html', list)
+
 
 @login_required
 def search_constracts(request):
@@ -91,6 +95,7 @@ def search_constracts(request):
         list = {'constract_list': constract_list}
         return render(request, 'constracts.html', list)
 
+
 @login_required
 def edit_constract(request, id):
     constract = HopDong.objects.get(id=id)
@@ -104,6 +109,7 @@ def edit_constract(request, id):
             }
     return render(request, 'constract_detail.html', list)
 
+
 @login_required
 def add_constract(request):
     constract_list = HopDong.objects.all()
@@ -116,6 +122,7 @@ def add_constract(request):
             'room_list': room_list
             }
     return render(request, 'constract_detail.html', list)
+
 
 @login_required
 def constract_saved(request):
@@ -154,10 +161,10 @@ def sinhviens(request):
     query = request.GET.get('q', '')
     phong = request.GET.get('rid', '')
     if phong != '':
-        sinhviens = SinhVien.objects.filter(
+        sinhviens = SinhVien.objects.select_related('MaPhong').filter(
             HoTen__icontains=query, MaPhong=phong)
     else:
-        sinhviens = SinhVien.objects.filter(
+        sinhviens = SinhVien.objects.select_related('MaPhong').filter(
             HoTen__icontains=query)
     # context = {"sinhviens": sinhviens}
 
@@ -204,8 +211,8 @@ def sinhvien_detail(request, id):
         sinhvien = SinhVien.objects.filter(id=id)[0]
         sinhvien.NgaySinh = sinhvien.NgaySinh.strftime("%Y-%m-%d")
         context = {"sinhvien": sinhvien,
-                    'phongs': phongs
-                    }
+                   'phongs': phongs
+                   }
         return render(request, 'sinhvien_detail.html', context)
     elif request.method == 'POST':
         sinhvien = get_object_or_404(SinhVien, pk=id)
@@ -215,9 +222,9 @@ def sinhvien_detail(request, id):
         phong = Phong.objects.get(id=request.POST['maphong'])
         phongs = Phong.objects.all()
         if so_sinh_vien >= phong.SoluongSV:
-            
-            return render(request, 'sinhvien_detail.html', {'phongs': phongs,"sinhvien": sinhvien, 'error': "Phòng đầy"})
-        
+
+            return render(request, 'sinhvien_detail.html', {'phongs': phongs, "sinhvien": sinhvien, 'error': "Phòng đầy"})
+
         sinhvien.HoTen = request.POST['hoten']
         sinhvien.GioiTinh = request.POST['gioitinh']
         sinhvien.NgaySinh = request.POST['ngaysinh']
@@ -227,17 +234,16 @@ def sinhvien_detail(request, id):
         sinhvien.MaPhong_id = request.POST['maphong']
         sinhvien.save()
 
-
         if so_sinh_vien + 1 == phong.SoluongSV:
             phong.TrangThai = True
             phong.save()
-        else :
+        else:
             phong.TrangThai = False
             phong.save()
 
         context = {"sinhvien": sinhvien,
-                            'phongs': phongs
-                            }
+                   'phongs': phongs
+                   }
 
         # Redirect to the detail page for the updated SinhVien object
         return render(request, 'sinhvien_detail.html', context)
@@ -252,11 +258,11 @@ def update_sinhvien(request, id):
         so_sinh_vien = SinhVien.objects.filter(
             MaPhong_id=request.POST['maphong']).count()
         phong = Phong.objects.get(id=request.POST['maphong'])
-        
+
         if so_sinh_vien >= phong.SoluongSV:
             phongs = Phong.objects.all()
             return render(request, 'sinhvien_detail.html', {'phongs': phongs, 'error': "Phòng đầy"})
-        
+
         sinhvien.HoTen = request.POST['hoten']
         sinhvien.GioiTinh = request.POST['gioitinh']
         sinhvien.NgaySinh = request.POST['ngaysinh']
@@ -266,11 +272,10 @@ def update_sinhvien(request, id):
         sinhvien.MaPhong_id = request.POST['maphong']
         sinhvien.save()
 
-
         if so_sinh_vien + 1 == phong.SoluongSV:
             phong.TrangThai = True
             phong.save()
-        else :
+        else:
             phong.TrangThai = False
             phong.save()
 
@@ -302,9 +307,9 @@ def add_sinhvien(request):
                             Email=request.POST['email'],
                             SoDienThoai=request.POST['sodienthoai'],
                             MaPhong_id=request.POST['maphong'],)
-        
+
         if so_sinh_vien + 1 == phong.SoluongSV:
-            phong.TrangThai =  True
+            phong.TrangThai = True
             phong.save()
         sinhvien.save()
 
@@ -381,11 +386,10 @@ def nhanVien(request, id):
     if role != 'ADMIN' and profile == 0:
         return redirect("/")
 
-
     data = {}
-    
+
     data['profile'] = profile
-    
+
     if id == 0:
         data['title'] = "Thêm nhân viên"
         data['id'] = 0
@@ -526,16 +530,13 @@ def phong(request):
     Phongs = Phong.objects.filter(Q(MaPhong__icontains=keyword) | Q(TrangThai__icontains=keyword) | Q(
         SoluongSV__icontains=keyword) | Q(LoaiPhong__icontains=keyword) | Q(Gia__icontains=keyword))
 
-    
-
-
     # data = Phong.objects.all()
     for phong in Phongs:
         so_luong = SinhVien.objects.filter(MaPhong_id=phong.id).count()
         phong.count = so_luong
         if so_luong == phong.SoluongSV:
             phong.TrangThai = True
-        else: 
+        else:
             phong.TrangThai = False
         phong.save()
 
