@@ -1,6 +1,6 @@
 {% load static %} {% include 'header.html' %}
 <!-- Recent Sales Start -->
-<form action="/sinhviens/{{sinhvien.id}}/update/" method="post" class="col-sm-12 col-xl-10 mt-5">
+<form action="/sinhviens/{{sinhvien.id}}/" method="post" class="col-sm-12 col-xl-10 mt-5">
     {% csrf_token %}
     <div class="bg-light rounded h-100 p-4">
         <h6 class="mb-4">Thông tin sinh viên</h6>
@@ -26,8 +26,14 @@
 
         <div class="form-floating mb-3">
             <select class="form-select" name="maphong" aria-label="Giới tính">
-                <option value="1">Phòng 001</option>
-                <option value="2">Phòng 002</option>
+                {% for phong in phongs %}
+                    <option value="{{phong.id}}"
+                {% if sinhvien.MaPhong_id == phong.id %}
+                     selected="selected"
+                {%  endif %}
+
+                     >Phòng {{phong.MaPhong}} </option>
+                {% endfor%}
             </select>
             <label for="floatingSelect">Phòng</label>
         </div>
@@ -48,6 +54,10 @@
         </div>
 
         <button type="submit" class="btn btn-primary">Update</button>
+
+        {% if error %}
+        <div class="mt-4 text-danger">{{error}}</div>
+        {%endif%}
     </div>
 </form>
 <!-- Recent Sales End -->

@@ -198,18 +198,26 @@ def sinhviens(request):
 
 @login_required
 def sinhvien_detail(request, id):
-    sinhvien = SinhVien.objects.filter(id=id)[0]
-    sinhvien.NgaySinh = sinhvien.NgaySinh.strftime("%Y-%m-%d")
-    context = {"sinhvien": sinhvien}
-    return render(request, 'sinhvien_detail.html', context)
 
-
-@login_required
-def update_sinhvien(request, id):
-    sinhvien = get_object_or_404(SinhVien, pk=id)
-
-    if request.method == 'POST':
+    if request.method == 'GET':
+        phongs = Phong.objects.all()
+        sinhvien = SinhVien.objects.filter(id=id)[0]
+        sinhvien.NgaySinh = sinhvien.NgaySinh.strftime("%Y-%m-%d")
+        context = {"sinhvien": sinhvien,
+                    'phongs': phongs
+                    }
+        return render(request, 'sinhvien_detail.html', context)
+    elif request.method == 'POST':
+        sinhvien = get_object_or_404(SinhVien, pk=id)
         # Update the SinhVien object with the data submitted in the form
+        so_sinh_vien = SinhVien.objects.filter(
+            MaPhong_id=request.POST['maphong']).count()
+        phong = Phong.objects.get(id=request.POST['maphong'])
+        phongs = Phong.objects.all()
+        if so_sinh_vien >= phong.SoluongSV:
+            
+            return render(request, 'sinhvien_detail.html', {'phongs': phongs,"sinhvien": sinhvien, 'error': "Phòng đầy"})
+        
         sinhvien.HoTen = request.POST['hoten']
         sinhvien.GioiTinh = request.POST['gioitinh']
         sinhvien.NgaySinh = request.POST['ngaysinh']
@@ -218,6 +226,53 @@ def update_sinhvien(request, id):
         sinhvien.SoDienThoai = request.POST['sodienthoai']
         sinhvien.MaPhong_id = request.POST['maphong']
         sinhvien.save()
+
+
+        if so_sinh_vien + 1 == phong.SoluongSV:
+            phong.TrangThai = True
+            phong.save()
+        else :
+            phong.TrangThai = False
+            phong.save()
+
+        context = {"sinhvien": sinhvien,
+                            'phongs': phongs
+                            }
+
+        # Redirect to the detail page for the updated SinhVien object
+        return render(request, 'sinhvien_detail.html', context)
+
+
+@login_required
+def update_sinhvien(request, id):
+    sinhvien = get_object_or_404(SinhVien, pk=id)
+
+    if request.method == 'POST':
+        # Update the SinhVien object with the data submitted in the form
+        so_sinh_vien = SinhVien.objects.filter(
+            MaPhong_id=request.POST['maphong']).count()
+        phong = Phong.objects.get(id=request.POST['maphong'])
+        
+        if so_sinh_vien >= phong.SoluongSV:
+            phongs = Phong.objects.all()
+            return render(request, 'sinhvien_detail.html', {'phongs': phongs, 'error': "Phòng đầy"})
+        
+        sinhvien.HoTen = request.POST['hoten']
+        sinhvien.GioiTinh = request.POST['gioitinh']
+        sinhvien.NgaySinh = request.POST['ngaysinh']
+        sinhvien.DiaChi = request.POST['diachi']
+        sinhvien.Email = request.POST['email']
+        sinhvien.SoDienThoai = request.POST['sodienthoai']
+        sinhvien.MaPhong_id = request.POST['maphong']
+        sinhvien.save()
+
+
+        if so_sinh_vien + 1 == phong.SoluongSV:
+            phong.TrangThai = True
+            phong.save()
+        else :
+            phong.TrangThai = False
+            phong.save()
 
         # Redirect to the detail page for the updated SinhVien object
         return redirect(sinhvien_detail, id=id)
@@ -230,11 +285,10 @@ def update_sinhvien(request, id):
 def add_sinhvien(request):
     if request.method == 'POST':
 
-        phong = Phong.objects.filter(id=request.POST['maphong'])
+        phong = Phong.objects.get(id=request.POST['maphong'])
 
         so_sinh_vien = SinhVien.objects.filter(
             MaPhong_id=request.POST['maphong']).count()
-        print(so_sinh_vien)
         if so_sinh_vien >= phong[0].SoluongSV:
             phongs = Phong.objects.all()
 
@@ -248,7 +302,10 @@ def add_sinhvien(request):
                             Email=request.POST['email'],
                             SoDienThoai=request.POST['sodienthoai'],
                             MaPhong_id=request.POST['maphong'],)
-
+        
+        if so_sinh_vien + 1 == phong.SoluongSV:
+            phong.TrangThai =  True
+            phong.save()
         sinhvien.save()
 
         return redirect(sinhviens)
@@ -473,12 +530,18 @@ def phong(request):
     Phongs = Phong.objects.filter(Q(MaPhong__icontains=keyword) | Q(TrangThai__icontains=keyword) | Q(
         SoluongSV__icontains=keyword) | Q(LoaiPhong__icontains=keyword) | Q(Gia__icontains=keyword))
 
+    
+
 
     # data = Phong.objects.all()
     for phong in Phongs:
-        sinh_vien = SinhVien.objects.filter(MaPhong_id=phong.id)
-        so_luong = sinh_vien.count()
+        so_luong = SinhVien.objects.filter(MaPhong_id=phong.id).count()
         phong.count = so_luong
+        if so_luong == phong.SoluongSV:
+            phong.TrangThai = True
+        else: 
+            phong.TrangThai = False
+        phong.save()
 
     # Tạo một đối tượng Paginator với all_records và số lượng bản ghi mỗi trang
     paginator = Paginator(Phongs, 3)
