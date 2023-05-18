@@ -106,6 +106,7 @@ def edit_constract(request, id):
             'constract': constract,
             'QL_list': QL_list,
             'room_list': room_list,
+            'check' : True
             'choose': 'hopdong'
             }
     # sinhvien = SinhVien.objects.get(id=id)
@@ -114,18 +115,20 @@ def edit_constract(request, id):
 
 @login_required
 def add_constract(request):
-    constract_list = HopDong.objects.all()
-    SV_list = SinhVien.objects.all()
+    Phongs = Phong.objects.all()
+
+    constract_list = HopDong.objects.all().values_list('MSSV_id', flat=True)
+    SV_list = SinhVien.objects.exclude(id__in=constract_list)
     QL_list = QuanLi.objects.all()
     room_list = Phong.objects.all()
     list = {'SV_list': SV_list,
             'constract_list': constract_list,
             'QL_list': QL_list,
             'room_list': room_list,
+            'check' : False,
             'choose': 'hopdong'
             }
     return render(request, 'constract_detail.html', list)
-
 
 @login_required
 def constract_saved(request):
@@ -134,7 +137,7 @@ def constract_saved(request):
     NgayKetThuc = str(request.POST.get('NgayKetThuc')).strip()
     GiaTien = request.POST.get('GiaTien')
     TrangThaiThanhToan = bool(request.POST.get('TrangThaiThanhToan'))
-    MSSV_id = str(request.POST.get('MSSV_id')).strip()
+    MSSV_id = str(request.POST.get('MSSV_id')).strip().split(',')[0]
     MaQuanLi_id = str(request.POST.get('MaQuanLi_id')).strip()
     MaPhong_id = str(request.POST.get('MaPhong_id')).strip()
 

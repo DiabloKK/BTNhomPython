@@ -1,6 +1,8 @@
 {% load static %}
 {% include 'header.html' %}
 
+
+
 <div class="container-fluid pt-4 px-4" style="padding-left: 0 !important;">
     <div class="bg-light rounded p-4">
         <div class="text-center" style="margin-bottom: 20px !important;">
@@ -34,12 +36,31 @@
             </div>
             <div class="mb-3">
                 <label class="form-label">Sinh Viên thuê</label>
-                <select class="form-control"  id="MSSV_id" name="MSSV_id" value="{{constract.MSSV.id}}">
+                <select {% if check == True %} readonly="true" {% endif %}class="form-control"  id="MSSV_id" name="MSSV_id" value="{{constract.MSSV.id}}">
                     {% for sv in SV_list %}
-                    <option value="{{sv.id}}" {% if constract.MSSV.HoTen == sv.HoTen %}selected{% endif %}>{{sv.HoTen}}</option>                
+                    <!-- <option value="{{sv.id}},{{sv.MaPhong.id}}" {% if constract.MSSV.HoTen == sv.HoTen %}selected{% endif %}>{{sv.HoTen}}</option> -->
+                    <option value="{{sv.id}},{{sv.MaPhong.id}}" {% if constract.MSSV.HoTen == sv.HoTen %}selected{% if loop.index != 1 %}disabled{% endif %}{% endif %}>{{sv.HoTen}}</option>
                     {% endfor %}
                 </select>
-            </div>
+            </div>            
+            <label class="form-label">Id phòng</label>
+            <input readonly="true" type="show" class="form-control" id="MaPhong_id" name="MaPhong_id" value="{{constract.MaPhong.id}}">
+            <script>
+                function setValue() {
+                    const selectBox = document.getElementById('MSSV_id');
+                    const inputValue = document.getElementById('MaPhong_id');                    
+                    
+                    selectBox.addEventListener('change', function() {
+                        const selectedValue = this.value;
+                        const parts = selectedValue.split(',');
+                        const value1 = parts[0];
+                        const value2 = parts[1];
+                        inputValue.value = value2;
+                    });
+                  }
+                  setValue();
+            </script>
+
             <div class="mb-3">
                 <label class="form-label">Quản lí</label>
                 <select class="form-control"  id="MaQuanLi_id" name="MaQuanLi_id" value="{{constract.MaQuanLi.id}}">
@@ -48,15 +69,8 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="mb-3">
-                <label class="form-label">Phòng</label>
-                <select class="form-control"  id="MaPhong_id" name="MaPhong_id" value="{{constract.MaPhong.id}}">
-                    {% for room in room_list %}
-                    <option value="{{room.id}}" {% if constract.MaPhong.MaPhong == room.MaPhong %}selected{% endif %}>{{room.MaPhong}}</option>                
-                    {% endfor %}
-                </select>
-            </div>
-            <input type="show" class="form-control" id="id" name="id" value="{{constract.id}}">
+            
+            <input type="hidden" class="form-control" id="id" name="id" value="{{constract.id}}">
             <div class="mb-3 text-center">
                 <button type="submit" class="btn btn-primary" style="margin-left: 30px">Submit</button>
             </div>
