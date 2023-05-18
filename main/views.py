@@ -106,7 +106,7 @@ def edit_constract(request, id):
             'constract': constract,
             'QL_list': QL_list,
             'room_list': room_list,
-            'check' : True
+            'check' : True,
             'choose': 'hopdong'
             }
     # sinhvien = SinhVien.objects.get(id=id)
