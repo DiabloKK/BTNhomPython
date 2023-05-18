@@ -100,7 +100,8 @@ def edit_constract(request, id):
     list = {'SV_list': SV_list,
             'constract': constract,
             'QL_list': QL_list,
-            'room_list': room_list
+            'room_list': room_list,
+            'check' : True
             }
     return render(request, 'constract_detail.html', list)
 
@@ -116,6 +117,7 @@ def add_constract(request):
             'constract_list': constract_list,
             'QL_list': QL_list,
             'room_list': room_list,
+            'check' : False
             }
     return render(request, 'constract_detail.html', list)
  

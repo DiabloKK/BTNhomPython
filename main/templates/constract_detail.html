@@ -36,14 +36,15 @@
             </div>
             <div class="mb-3">
                 <label class="form-label">Sinh Viên thuê</label>
-                <select class="form-control"  id="MSSV_id" name="MSSV_id" value="{{constract.MSSV.id}}">
+                <select {% if check == True %} readonly="true" {% endif %}class="form-control"  id="MSSV_id" name="MSSV_id" value="{{constract.MSSV.id}}">
                     {% for sv in SV_list %}
-                    <option value="{{sv.id}},{{sv.MaPhong.id}}" {% if constract.MSSV.HoTen == sv.HoTen %}selected{% endif %}>{{sv.HoTen}}</option>
+                    <!-- <option value="{{sv.id}},{{sv.MaPhong.id}}" {% if constract.MSSV.HoTen == sv.HoTen %}selected{% endif %}>{{sv.HoTen}}</option> -->
+                    <option value="{{sv.id}},{{sv.MaPhong.id}}" {% if constract.MSSV.HoTen == sv.HoTen %}selected{% if loop.index != 1 %}disabled{% endif %}{% endif %}>{{sv.HoTen}}</option>
                     {% endfor %}
                 </select>
             </div>            
             <label class="form-label">Id phòng</label>
-            <input type="show" class="form-control" id="MaPhong_id" name="MaPhong_id" value="{{constract.MaPhong.id}}">
+            <input readonly="true" type="show" class="form-control" id="MaPhong_id" name="MaPhong_id" value="{{constract.MaPhong.id}}">
             <script>
                 function setValue() {
                     const selectBox = document.getElementById('MSSV_id');
