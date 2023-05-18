@@ -89,7 +89,7 @@
                             >
                         </td>
                         <td>
-                            <a class="btn btn-sm btn-danger" href="/nhanvien/delete/{{nhanvien.id}}"
+                            <a class="btn btn-sm btn-danger link-delete" href="/nhanvien/delete/{{nhanvien.id}}"
                                 >Delete</a
                             >
                         </td>
@@ -128,11 +128,54 @@
     </div>
 </div>
 <!-- Recent Sales End -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-<script type="text/javascript">
+
+<div class="modal fade text-center" id="confirmModal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="modalTitle">Delete Confirmation</h4>
+            </div>
+
+            <div class="modal-body">
+                <span id="confirmText"></span>
+            </div>
+
+            <div class="modal-footer">
+                <a class="btn btn-success" href="" id="yesButton">Yes</a>
+                <button type="button" class="btn btn-danger" id="noButton" data-dismiss="modal">No</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script type="text/javascript">  
+    $(document).ready(function () {
+        $(".link-delete").on("click", function (e) {
+            e.preventDefault();
+            var link = $(this);
+            var confirmText = "Bạn chắc chắn muốn xóa Nhân viên ?";
+            var href = link.attr("href");
+
+            $("#confirmText").text(confirmText);
+            $("#yesButton").attr("href", href);
+            $("#confirmModal").modal("show");
+        });
+
+        $("#noButton").on("click", function (e) {
+            $("#confirmModal").modal("hide");
+        });
+    });
+
     function clearFilter() {
         window.location = "http://127.0.0.1:8000/nhanviens/";
     }
 </script>
+
 
 {% include 'footer.html' %}

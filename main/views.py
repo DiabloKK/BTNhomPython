@@ -18,7 +18,7 @@ from django.contrib.auth.decorators import login_required
 @login_required
 def index(request):
     # QuanLi.objects.all().delete()
-    return render(request, 'index.html')
+    return render(request, 'index.html', {'choose': 'dashboard'})
 
 
 def login_view(request):
@@ -48,6 +48,8 @@ def logout_view(request):
     return response
 
 # Show all the constracts
+
+
 @login_required
 def change_password(request):
 
@@ -55,26 +57,28 @@ def change_password(request):
         user = request.user
         print(user)
         if user.check_password(request.POST.get('password_older')):
-            if request.POST.get('new_password')  == request.POST.get('repeat_new_password'):
+            if request.POST.get('new_password') == request.POST.get('repeat_new_password'):
                 user.set_password(request.POST.get('new_password'))
                 user.save()
                 return redirect('/login/')
             else:
-                return render(request, 'changepassword.html',{
+                return render(request, 'changepassword.html', {
                     'message': "Mật khẩu mới không trùng khớp"
                 })
         else:
-            return render(request, 'changepassword.html',{
-                    'message': "Mật khẩu không trùng khớp"
-                })
+            return render(request, 'changepassword.html', {
+                'message': "Mật khẩu không trùng khớp"
+            })
     return render(request, 'changepassword.html')
+
 
 @login_required
 def all_constracts(request):
     constract_list = HopDong.objects.all()
     room_list = Phong.objects.all()
-    list = {'constract_list': constract_list}
+    list = {'constract_list': constract_list, 'choose': 'hopdong'}
     return render(request, 'constracts.html', list)
+
 
 @login_required
 def search_constracts(request):
@@ -88,8 +92,9 @@ def search_constracts(request):
     else:
         constract_list = HopDong.objects.filter(
             Q(TrangThaiThanhToan__icontains=status))
-        list = {'constract_list': constract_list}
+        list = {'constract_list': constract_list, 'choose': 'hopdong'}
         return render(request, 'constracts.html', list)
+
 
 @login_required
 def edit_constract(request, id):
@@ -102,8 +107,11 @@ def edit_constract(request, id):
             'QL_list': QL_list,
             'room_list': room_list,
             'check' : True
+            'choose': 'hopdong'
             }
+    # sinhvien = SinhVien.objects.get(id=id)
     return render(request, 'constract_detail.html', list)
+
 
 @login_required
 def add_constract(request):
@@ -117,10 +125,11 @@ def add_constract(request):
             'constract_list': constract_list,
             'QL_list': QL_list,
             'room_list': room_list,
-            'check' : False
+            'check' : False,
+            'choose': 'hopdong'
             }
     return render(request, 'constract_detail.html', list)
- 
+
 @login_required
 def constract_saved(request):
     id = request.POST.get('id')
@@ -158,10 +167,10 @@ def sinhviens(request):
     query = request.GET.get('q', '')
     phong = request.GET.get('rid', '')
     if phong != '':
-        sinhviens = SinhVien.objects.filter(
+        sinhviens = SinhVien.objects.select_related('MaPhong').filter(
             HoTen__icontains=query, MaPhong=phong)
     else:
-        sinhviens = SinhVien.objects.filter(
+        sinhviens = SinhVien.objects.select_related('MaPhong').filter(
             HoTen__icontains=query)
     # context = {"sinhviens": sinhviens}
 
@@ -194,7 +203,8 @@ def sinhviens(request):
         'totalPage': total_page,
         'numbers': numbers,
         'totalSinhvien': total_sinhvien,
-        'keyword': query
+        'keyword': query,
+        'choose': 'sinhvien'
     }
 
     return render(request, 'sinhvien.html', context)
@@ -208,7 +218,8 @@ def sinhvien_detail(request, id):
         sinhvien = SinhVien.objects.filter(id=id)[0]
         sinhvien.NgaySinh = sinhvien.NgaySinh.strftime("%Y-%m-%d")
         context = {"sinhvien": sinhvien,
-                    'phongs': phongs
+                    'phongs': phongs,
+                    'choose': 'sinhvien'
                     }
         return render(request, 'sinhvien_detail.html', context)
     elif request.method == 'POST':
@@ -218,10 +229,8 @@ def sinhvien_detail(request, id):
             MaPhong_id=request.POST['maphong']).count()
         phong = Phong.objects.get(id=request.POST['maphong'])
         phongs = Phong.objects.all()
-        if so_sinh_vien >= phong.SoluongSV:
-            
-            return render(request, 'sinhvien_detail.html', {'phongs': phongs,"sinhvien": sinhvien, 'error': "Phòng đầy"})
-        
+        if so_sinh_vien >= phong.SoluongSV:          
+            return render(request, 'sinhvien_detail.html', {'phongs': phongs,"sinhvien": sinhvien, 'error': "Phòng đầy", 'choose': 'sinhvien'})
         sinhvien.HoTen = request.POST['hoten']
         sinhvien.GioiTinh = request.POST['gioitinh']
         sinhvien.NgaySinh = request.POST['ngaysinh']
@@ -231,17 +240,17 @@ def sinhvien_detail(request, id):
         sinhvien.MaPhong_id = request.POST['maphong']
         sinhvien.save()
 
-
         if so_sinh_vien + 1 == phong.SoluongSV:
             phong.TrangThai = True
             phong.save()
-        else :
+        else:
             phong.TrangThai = False
             phong.save()
 
         context = {"sinhvien": sinhvien,
-                            'phongs': phongs
-                            }
+                    'phongs': phongs,
+                    'choose': 'sinvien'
+                    }
 
         # Redirect to the detail page for the updated SinhVien object
         return render(request, 'sinhvien_detail.html', context)
@@ -256,11 +265,10 @@ def update_sinhvien(request, id):
         so_sinh_vien = SinhVien.objects.filter(
             MaPhong_id=request.POST['maphong']).count()
         phong = Phong.objects.get(id=request.POST['maphong'])
-        
+
         if so_sinh_vien >= phong.SoluongSV:
             phongs = Phong.objects.all()
-            return render(request, 'sinhvien_detail.html', {'phongs': phongs, 'error': "Phòng đầy"})
-        
+            return render(request, 'sinhvien_detail.html', {'phongs': phongs, 'error': "Phòng đầy", 'choose': 'sinhvien'})
         sinhvien.HoTen = request.POST['hoten']
         sinhvien.GioiTinh = request.POST['gioitinh']
         sinhvien.NgaySinh = request.POST['ngaysinh']
@@ -270,11 +278,10 @@ def update_sinhvien(request, id):
         sinhvien.MaPhong_id = request.POST['maphong']
         sinhvien.save()
 
-
         if so_sinh_vien + 1 == phong.SoluongSV:
             phong.TrangThai = True
             phong.save()
-        else :
+        else:
             phong.TrangThai = False
             phong.save()
 
@@ -282,7 +289,7 @@ def update_sinhvien(request, id):
         return redirect(sinhvien_detail, id=id)
 
     # Render the update SinhVien form with the current data for the SinhVien object
-    return render(request, 'sinhvien_detail.html', {'sinhvien': sinhvien})
+    return render(request, 'sinhvien_detail.html', {'sinhvien': sinhvien, 'choose': 'sinhvien'})
 
 
 @login_required
@@ -296,7 +303,7 @@ def add_sinhvien(request):
         if so_sinh_vien >= phong[0].SoluongSV:
             phongs = Phong.objects.all()
 
-            return render(request, 'add_sinhvien.html', {'phongs': phongs, 'error': "Phòng đầy"})
+            return render(request, 'add_sinhvien.html', {'phongs': phongs, 'error': "Phòng đầy", 'choose': 'sinhvien'})
 
         sinhvien = SinhVien(HoTen=request.POST['hoten'],
                             MSSV=request.POST['mssv'],
@@ -306,9 +313,9 @@ def add_sinhvien(request):
                             Email=request.POST['email'],
                             SoDienThoai=request.POST['sodienthoai'],
                             MaPhong_id=request.POST['maphong'],)
-        
+
         if so_sinh_vien + 1 == phong.SoluongSV:
-            phong.TrangThai =  True
+            phong.TrangThai = True
             phong.save()
         sinhvien.save()
 
@@ -316,7 +323,7 @@ def add_sinhvien(request):
 
     phongs = Phong.objects.all()
 
-    return render(request, 'add_sinhvien.html', {'phongs': phongs})
+    return render(request, 'add_sinhvien.html', {'phongs': phongs, 'choose': 'sinhvien'})
 
 
 @login_required
@@ -370,7 +377,8 @@ def nhanViens(request):
         'numbers': numbers,
         'totalNhanVien': totalNhanVien,
         'sort': type,
-        'keyword': keyword
+        'keyword': keyword,
+        'choose': 'nhanvien'
     }
 
     return render(request, 'nhanviens.html', context)
@@ -385,11 +393,10 @@ def nhanVien(request, id):
     if role != 'ADMIN' and profile == 0:
         return redirect("/")
 
-
     data = {}
-    
+
     data['profile'] = profile
-    
+
     if id == 0:
         data['title'] = "Thêm nhân viên"
         data['id'] = 0
@@ -408,6 +415,7 @@ def nhanVien(request, id):
         data['nhanvien']['NgaySinh'] = birthday and datetime.datetime.strptime(
             birthday, '%Y-%m-%d')
         del request.session['nhanvien']
+    data['choose'] = 'nhanvien'
     return render(request, 'nhanvien.html', data)
 
 
@@ -516,34 +524,36 @@ def nhanVien_delete(request, id):
 
     nhanvien = QuanLi.objects.get(id=id)
     nhanvien.delete()
-    return nhanViens(request)
+    
+    user = User.objects.get(username = nhanvien.Email)
+    user.delete()
+    
+    return redirect('/nhanviens/')
 
 
 @login_required
 def phong(request):
-
+    trangthai =  request.POST.get('trangthai')
+    print(trangthai)
     keyword = request.GET.get('keyword', '')
     if request.method == 'POST':
         txt = str(request.POST.get('txt')).strip()
         keyword = txt
-
-    Phongs = Phong.objects.filter(Q(MaPhong__icontains=keyword) | Q(TrangThai__icontains=keyword) | Q(
+   
+    if trangthai != None:
+        Phongs = Phong.objects.filter(TrangThai=False)
+    else:
+        Phongs = Phong.objects.filter(Q(MaPhong__icontains=keyword) | Q(TrangThai__icontains=keyword) | Q(
         SoluongSV__icontains=keyword) | Q(LoaiPhong__icontains=keyword) | Q(Gia__icontains=keyword))
 
-    
-
-
-    # data = Phong.objects.all()
     for phong in Phongs:
         so_luong = SinhVien.objects.filter(MaPhong_id=phong.id).count()
         phong.count = so_luong
         if so_luong == phong.SoluongSV:
             phong.TrangThai = True
-        else: 
+        else:
             phong.TrangThai = False
         phong.save()
-
-    # Tạo một đối tượng Paginator với all_records và số lượng bản ghi mỗi trang
     paginator = Paginator(Phongs, 3)
 
     # Lấy số trang từ query parameter (nếu không có sẽ trả về trang đầu tiên)
@@ -562,6 +572,8 @@ def phong(request):
     index = (page_number - 1)*3
     numbers = list(range(1, total_page+1))
 
+        
+
     context = {
         'data': data_page,
         'page': page_number,
@@ -569,8 +581,8 @@ def phong(request):
         'totalPage': total_page,
         'numbers': numbers,
         'totaldata': totaldata,
-        'keyword': keyword
-
+        'keyword': keyword,
+        'choose': 'phong'
     }
 
     return render(request, './pages/phong.html', context)
@@ -581,27 +593,27 @@ def update_phong(request, id):
     data = get_object_or_404(Phong, id=id)
     if request.method == 'POST':
         data.MaPhong = request.POST['MaPhong']
-        data.TrangThai = request.POST['TrangThai']
         data.SoluongSV = request.POST['SoluongSV']
         data.LoaiPhong = request.POST['LoaiPhong']
         data.Gia = request.POST['Gia']
         data.TenToaNha = request.POST['TenToaNha']
         data.save()
         return redirect(phong)
-    return render(request, './pages/update.html', {'data': data})
+    return render(request, './pages/update.html', {'data': data, 'choose': 'phong'})
 
 
 @login_required
 def add_Phong(request):
     # phongs = Phong.objects.all()
     if request.method == 'POST':
-        Phong(
+        Phong.create_Phong(
             request.POST['MaPhong'],
-            request.POST['TrangThai'],
+            False,
             request.POST['SoluongSV'],
             request.POST['LoaiPhong'],
             request.POST['Gia'],
             request.POST['TenToaNha']
         )
+
         return redirect(phong)
-    return render(request, './pages/add.html')
+    return render(request, './pages/add.html', {'choose': 'phong'})
